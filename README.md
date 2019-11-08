@@ -14,7 +14,7 @@ Projeto referente a terceira unidade da disciplina Introdução à Técnicas de 
 > 7. polygon (desenha um polígono através de uma lista de pontos)
 > 8. fill    (preenche todo o polígono ou imagem com a cor especificada)
 > 9. save    (salva em um arquivo ppm)
-> 10.open    (carrega uma imagem ppm)
+> 10. open    (carrega uma imagem ppm)
 
 # Funções extra
 > Não possui funções extra até o momento

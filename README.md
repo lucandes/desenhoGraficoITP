@@ -5,7 +5,7 @@ Projeto referente a terceira unidade da disciplina Introdução à Técnicas de 
 > Desenvolver um programa capaz de criar, ler e editar imagens com formato .ppm
 
 # Funções padrão
-> 1. Função intérprete
+> 1. help    (imprime a lista de comandos)
 > 2. image   (cria uma imagem)
 > 3. color   (muda a cor do pincel)
 > 4. clear   (preenche toda a imagem com a cor especificada)

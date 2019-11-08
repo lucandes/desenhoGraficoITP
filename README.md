@@ -1,5 +1,5 @@
 # Desenho Gráfico em C
-> Projeto referente a terceira unidade da disciplina Introdução à Técnicas de Programação
+Projeto referente a terceira unidade da disciplina Introdução à Técnicas de Programação
 
 # Objetivo
 > Desenvolver um programa capaz de criar, ler e editar imagens com formato .ppm

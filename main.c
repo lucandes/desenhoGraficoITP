@@ -2,32 +2,41 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "structs.h"
+#include "struct.h"
 #include "default.h"
 
 void imprimirApresentacao();
 
 int main(){
-	char entrada[10];
-	int sair = 0;
-	int imagemAberta = 0;
-	Imagem imagem;
+	/* inicialização de variáveis */
+	char entrada[10];     // recebe o comando do usuario
+	int sair = 0;         // indica se o usuraio deseja sair do programa
+	int imagemAberta = 0; // indica se existe uma imagem aberta no programa
+	Imagem imagem;        // receberá todas as informações correspondentes a imagem
 
 
 	imprimirApresentacao();
 	do {
+		/* leitura do comando */
+		printf("> ");
 		setbuf(stdin, NULL);
 		scanf("%s", entrada);
 
-		if (!strcmp(entrada, "imagem"))
-			imagem = criarImagem(&imagemAberta, imagem.pixels);
+		/* aqui são checados apenas os comandos principais */
+		if (!strcmp(entrada, "imagem")){
+			imagem = criarImagem();
+			imagemAberta = 1;
+		}
 
 		else if (!strcmp(entrada, "sair")){
-			liberarAD(&imagem, imagem.pixels);
+			if (imagemAberta)
+				liberarAD(&imagem, imagem.pixels);
 			sair = 1;
 		}
-		else
-			printf("comando inexistente\n");
+
+		else {
+			executa(entrada, &imagem);
+		}
 
 	} while (!sair);
 
@@ -39,5 +48,5 @@ void imprimirApresentacao(){
 	printf("DESENHO GRAFICO - PROJETO UNIDADE III\n");
 	printf("INTRODUCAO AS TECNICAS DE PROGRAMACAO\n\n");
 	printf("Autor: Lucas Fernandes de Oliveira\n");
-	printf("*************************************\n");
+	printf("*************************************\n\n");
 }

@@ -39,6 +39,34 @@ Imagem criarImagem(){
 }
 
 /****************************************************
+Função: 
+Parâmetros: 
+Retorno: 
+
+Descrição:
+*****************************************************/
+void salvarImagem(Imagem *imagem){
+	scanf("%s", (char *) &imagem->nomeDoArquivo);
+
+	imagem->arquivo = fopen(imagem->nomeDoArquivo, "w");
+
+	fprintf(imagem->arquivo, "%s\n", imagem->id);
+	fprintf(imagem->arquivo, "%d %d\n", imagem->lar, imagem->alt);
+	fprintf(imagem->arquivo, "%d\n", imagem->max);
+
+	for (int x = 0; x < imagem->lar; x++){
+		for (int y = 0; y < imagem->alt; y++){
+			fprintf(imagem->arquivo, "%d %d %d\n",
+				imagem->pixels[x][y].r,
+				imagem->pixels[x][y].g,
+				imagem->pixels[x][y].b);
+		}
+	}
+
+	fclose(imagem->arquivo);
+}
+
+/****************************************************
 Função: liberaAD
 Parâmetros: ponteiro de estrutura Imagem, matriz do tipo Pixel
 Retorno: nenhum
@@ -61,7 +89,15 @@ Descrição: lê e interpreta a entrada do usuário caso a entrada
 seja compatível com um comando do programa.
 *****************************************************/
 void executar(char entrada[10], Imagem *imagem){
-	if (!strcmp(entrada, ""))
+	if (!strcmp(entrada, "help")){
+		printf("--------------------------------------\n");
+		printf("help    (imprime a lista de comandos)\n");
+		printf("image   (cria uma imagem)\n");
+		printf("color   (muda a cor do pincel)\n");
+		printf("clear   (preenche toda a imagem)\n");
+		printf("save    (salva em um arquivo ppm)\n");
+		printf("open    (carrega uma imagem ppm)\n\n");
+	}
 	else if (!strcmp(entrada, "clear")){
 		int r,g,b;
 		scanf("%d %d %d", &r, &g, &b);

@@ -34,8 +34,12 @@ int main(){
 			sair = 1;
 		}
 
+		else if (!strcmp(entrada, "salvar")){
+			if (imagemAberta)
+				salvarImagem(&imagem);
+		}
 		else {
-			executa(entrada, &imagem);
+			executar(entrada, &imagem);
 		}
 
 	} while (!sair);

@@ -1,7 +1,21 @@
 #include "safestdlib.h"
 
-#include <stdlib.h>
-#include <stdio.h>
+/****************************************************
+Função: 
+Parâmetros: 
+Retorno: 
+
+Descrição:
+*****************************************************/
+void *safeMalloc(size_t size){
+	void *p;
+	p = malloc(size);
+
+	if (p == NULL)
+		exit(1);
+
+	return p;
+}
 
 /****************************************************
 Função: 
@@ -10,13 +24,12 @@ Retorno:
 
 Descrição:
 *****************************************************/
-safeMalloc(size_t size);
+void *safeCalloc(int times, size_t size){
+	void *p;
+	p = calloc(times, size);
 
-/****************************************************
-Função: 
-Parâmetros: 
-Retorno: 
+	if (p == NULL)
+		exit(1);
 
-Descrição:
-*****************************************************/
-safeCalloc(int times, size_t size);
+	return p;
+}

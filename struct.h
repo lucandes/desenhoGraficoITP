@@ -12,8 +12,8 @@ typedef struct ponto {
 }Ponto;
 
 typedef struct imagem {
-	FILE *file;
-	char filename[30];
+	FILE *arquivo;
+	char nomeDoArquivo[30];
 	
 	char id[3];
 	int lar, alt;

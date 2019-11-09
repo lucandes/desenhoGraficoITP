@@ -39,7 +39,7 @@ int main(){
 				salvarImagem(&imagem);
 		}
 		else {
-			executar(entrada, &imagem);
+			executar(entrada, &imagem, imagemAberta);
 		}
 
 	} while (!sair);
@@ -48,6 +48,7 @@ int main(){
 }
 
 void imprimirApresentacao(){
+	system("clear");
 	printf("*************************************\n");
 	printf("DESENHO GRAFICO - PROJETO UNIDADE III\n");
 	printf("INTRODUCAO AS TECNICAS DE PROGRAMACAO\n\n");

@@ -1,12 +1,10 @@
 #include "safestdlib.h"
 
-/****************************************************
-Função: 
-Parâmetros: 
-Retorno: 
+/*********************************
+funções que verificam se a alocação foi 
+realizada com sucesso antes de retornar 
+*********************************/
 
-Descrição:
-*****************************************************/
 void *safeMalloc(size_t size){
 	void *p;
 	p = malloc(size);
@@ -17,13 +15,6 @@ void *safeMalloc(size_t size){
 	return p;
 }
 
-/****************************************************
-Função: 
-Parâmetros: 
-Retorno: 
-
-Descrição:
-*****************************************************/
 void *safeCalloc(int times, size_t size){
 	void *p;
 	p = calloc(times, size);

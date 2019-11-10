@@ -5,6 +5,7 @@
 
 void liberarAD(Imagem *imagem, Pixel **pixels);
 void limparBuffer(void);
+void limpaConsole(void);
 void executar(char entrada[10], Imagem *imagem, int imagemAberta);
 
 #endif

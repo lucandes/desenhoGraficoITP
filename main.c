@@ -37,7 +37,10 @@ int main(){
 		else if (!strcmp(entrada, "salvar")){
 			if (imagemAberta)
 				salvarImagem(&imagem);
+			else
+				printf("Erro: nao existe uma imagem aberta\n");
 		}
+		
 		else {
 			executar(entrada, &imagem, imagemAberta);
 		}
@@ -48,10 +51,10 @@ int main(){
 }
 
 void imprimirApresentacao(){
-	system("clear");
+	limpaConsole();
 	printf("*************************************\n");
 	printf("DESENHO GRAFICO - PROJETO UNIDADE III\n");
 	printf("INTRODUCAO AS TECNICAS DE PROGRAMACAO\n\n");
-	printf("Autor: Lucas Fernandes de Oliveira\n");
+	printf("Aluno: Lucas Fernandes de Oliveira\n");
 	printf("*************************************\n\n");
 }

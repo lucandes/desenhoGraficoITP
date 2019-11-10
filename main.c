@@ -18,7 +18,6 @@ int main(){
 	imprimirApresentacao();
 	do {
 		/* leitura do comando */
-		printf("> ");
 		setbuf(stdin, NULL);
 		scanf("%s", entrada);
 
@@ -31,14 +30,18 @@ int main(){
 		else if (!strcmp(entrada, "sair")){
 			if (imagemAberta)
 				liberarAD(&imagem, imagem.pixels);
+			
 			sair = 1;
 		}
 
 		else if (!strcmp(entrada, "salvar")){
-			if (imagemAberta)
-				salvarImagem(&imagem);
-			else
-				printf("Erro: nao existe uma imagem aberta\n");
+			if (!imagemAberta){
+				printf("Erro: imagem nao aberta\n");
+				limparBuffer();
+				continue;
+			}
+
+			salvarImagem(&imagem);
 		}
 		
 		else {

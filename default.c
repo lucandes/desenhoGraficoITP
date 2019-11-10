@@ -16,9 +16,46 @@ Descrição: libera toda alocação dinâmica utilizada ao longo do
 programa, esta função será chamada quando o usuário desejar sair.
 *****************************************************/
 void liberarAD(Imagem *imagem, Pixel **pixels){
-	for (int i = 0; i < imagem->lar; ++i)
+	for (int i = 0; i < imagem->alt; ++i)
 		free(pixels[i]);
 	free(pixels);
+}
+
+/****************************************************
+Função: mudarCor
+Parâmetros: ponteiro tipo Imagem
+Retorno: nenhum
+
+Descrição: altera a cor do pincel da imagem
+*****************************************************/
+void mudarCor(Imagem *imagem){
+	Cor novaCor;
+	novaCor = criarCor();
+
+		imagem->cor.r = novaCor.r;
+		imagem->cor.g = novaCor.g;
+		imagem->cor.b = novaCor.b;
+}
+
+/****************************************************
+Função: limparImagem
+Parâmetros: ponteiro tipo Imagem
+Retorno: nenhum
+
+Descrição: limpa toda a imagem para uma cor especificada
+*****************************************************/
+void limparImagem(Imagem *imagem){
+	Cor cor = criarCor();
+
+	for (int i = 0; i < imagem->alt; ++i)
+		for (int j = 0; j < imagem->lar; ++j){
+			imagem->pixels[i][j].r = cor.r;
+			imagem->pixels[i][j].g = cor.g;
+			imagem->pixels[i][j].b = cor.b;
+		}
+
+	/* todos os desenhos serão apagados */
+	imagem->desenho = criarDesenho();
 }
 
 /****************************************************
@@ -31,6 +68,7 @@ após um comando inválido, desconsiderando todas as demais
 informações inseridas pelo usuário
 *****************************************************/
 void limparBuffer(void){
+	/* lê até encontrar uma quebra de linha */
 	while (getchar() != '\n');
 }
 
@@ -84,15 +122,7 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta){
 			return;
 		}
 
-		int r,g,b;
-		scanf("%d %d %d", &r, &g, &b);
-
-		for (int i = 0; i < imagem->lar; ++i)
-			for (int j = 0; j < imagem->alt; ++j){
-				imagem->pixels[i][j].r = r;
-				imagem->pixels[i][j].g = g;
-				imagem->pixels[i][j].b = b;
-			}
+		limparImagem(imagem);
 	}
 
 	/* comando linha */
@@ -108,10 +138,8 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta){
 
 	/* comando cor */
 	else if (!strcmp(entrada, "cor")){
-		scanf("%d %d %d",
-			&imagem->cor.r,
-			&imagem->cor.g,
-			&imagem->cor.b);
+		// pode ser alterado com a imagem fechada
+		mudarCor(imagem);
 	}
 
 	/* comando desenhos */

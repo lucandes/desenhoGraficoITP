@@ -7,7 +7,7 @@
 
 /*********************
 Estrutura: Pixel
-Descrição: representa os pixels da imagem
+Descrição: armazena as informações sobre o pixel
 *********************/
 typedef struct pixel {
 	int r,g,b;
@@ -15,7 +15,7 @@ typedef struct pixel {
 
 /*********************
 Estrutura: Cor
-Descrição: representa cores no formato RGB
+Descrição: armazena cores no formato RGB
 *********************/
 typedef struct cor {
 	int r,g,b;
@@ -23,7 +23,7 @@ typedef struct cor {
 
 /*********************
 Estrutura: Ponto
-Descrição: guardam informações sobre pontos na imagem
+Descrição: armazena informações sobre pontos na imagem
 *********************/
 typedef struct ponto {
 	int x, y;
@@ -31,17 +31,18 @@ typedef struct ponto {
 
 /*********************
 Estrutura: Linha
-Descrição: guardam informações sobre linhas na imagem
+Descrição: armazena informações sobre linhas na imagem
 *********************/
 typedef struct {
 	Ponto inicio;
 	Ponto fim;
+	Cor cor;
 }Linha;
 
 /*********************
 Estrutura: Desenho
-Descrição: Todo desenho feito no programa será representado
-dentro dessa estrutura, tornando sua manipulação mais eficiente
+Descrição: Todo desenho feito no programa será armazenado
+nessa estrutura, tornando sua manipulação mais eficiente
 *********************/
 typedef struct desenho {
 	Linha linhas[100];
@@ -51,7 +52,7 @@ typedef struct desenho {
 
 /*********************
 Estrutura: Imagem
-Descrição: responsável por armazenar toda informação sobre a imagem aberta
+Descrição: armazena informações sobre a imagem aberta
 *********************/
 typedef struct imagem {
 	FILE *arquivo;
@@ -68,11 +69,12 @@ typedef struct imagem {
 }Imagem;
 
 /* funções referentes as estruturas declaradas */
-Desenho criaDesenho(void);
+Desenho criarDesenho(void);
 void listarDesenhos(Desenho d);
 void inserirDesenhos(Imagem *imagem);
 Cor criarCor(void);
 Imagem criarImagem(void);
 void salvarImagem(Imagem *imagem);
+void pintarPixel(int x, int y, Pixel **pixels, Cor cor);
 
 #endif

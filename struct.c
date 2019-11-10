@@ -11,7 +11,7 @@ Retorno: estrutura Desenho
 
 Descrição: responsável por criar uma estrutura Desenho e retorná-la
 *****************************************************/
-Desenho criaDesenho(void){
+Desenho criarDesenho(void){
 	Desenho d;
 
 	d.numLinhas = 0;
@@ -62,7 +62,19 @@ Descrição: cria uma cor com valores RGB informados pelo usuário
 Cor criarCor(void){
 	Cor cor;
 	int r,g,b;
-	scanf("%d %d %d", &r, &g, &b);
+
+	limparBuffer();
+
+	printf("  Valores de cor RGB\n");
+
+	printf("    R: ");
+	scanf(" %d", &r);
+
+	printf("    G: ");
+	scanf(" %d", &g);
+
+	printf("    B: ");
+	scanf(" %d", &b);
 
 	cor.r = r;
 	cor.g = g;
@@ -87,8 +99,17 @@ Imagem criarImagem(void){
 	imagem.max = 255;
 	strcpy(imagem.nomeDoArquivo, "./imagens/"); // toda imagem gerada será salva na pasta imagens
 
+	limparBuffer();
+
 	/* leitura das dimensões da imagem a ser criada */
-	scanf("%d %d", &imagem.lar, &imagem.alt);
+	printf("  Dimensoes\n");
+
+	printf("    Largura: ");
+	scanf(" %d", &imagem.lar);
+
+	printf("    Altura:  ");
+	scanf(" %d", &imagem.alt);
+
 	imagem.numDePixels = imagem.lar * imagem.alt;
 
 	/* alocação dinâmica da matriz pixels */
@@ -110,7 +131,7 @@ Imagem criarImagem(void){
 	imagem.cor.b = 0;
 
 	/* inicia uma estrutura de desenho */
-	imagem.desenho = criaDesenho();
+	imagem.desenho = criarDesenho();
 
 	return imagem;
 }
@@ -126,6 +147,10 @@ da imagem dentro dele.
 void salvarImagem(Imagem *imagem){
 	/* recebendo nome do arquivo */
 	char arqNome[30]; 
+
+	limparBuffer();
+
+	printf("  Nome do arquivo: ");
 	scanf("%s", (char *) &arqNome);
 	strcat(imagem->nomeDoArquivo, arqNome);
 
@@ -152,5 +177,19 @@ void salvarImagem(Imagem *imagem){
 
 	/* fechando arquivo */
 	fclose(imagem->arquivo);
+}
+
+/****************************************************
+Função: pintarPixel
+Parâmetros: coordenadas do pixel, matriz tipo Pixel, cor tipo Cor
+Retorno: nenhum
+
+Descrição: altera a cor do pixel na matriz
+*****************************************************/
+void pintarPixel(int x, int y, Pixel **pixels, Cor cor){
+	// invertido pois a matriz foi inicializada a partir da altura
+	pixels[y][x].r = cor.r;
+	pixels[y][x].g = cor.g;
+	pixels[y][x].b = cor.b;
 }
 

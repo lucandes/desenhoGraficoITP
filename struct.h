@@ -75,6 +75,7 @@ void inserirDesenhos(Imagem *imagem);
 Cor criarCor(void);
 Imagem criarImagem(void);
 void salvarImagem(Imagem *imagem);
+Imagem abrirImagem(void);
 void pintarPixel(int x, int y, Pixel **pixels, Cor cor);
 
 #endif

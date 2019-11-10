@@ -27,6 +27,15 @@ int main(){
 			imagemAberta = 1;
 		}
 
+		else if (!strcmp(entrada, "abrir")){
+			imagem = abrirImagem();
+			if (imagem.arquivo == NULL){
+				printf("Erro: nao foi possivel abrir a imagem\n");
+				continue;
+			}
+			imagemAberta = 1;
+		}
+
 		else if (!strcmp(entrada, "sair")){
 			if (imagemAberta)
 				liberarAD(&imagem, imagem.pixels);

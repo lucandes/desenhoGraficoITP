@@ -102,12 +102,10 @@ Imagem criarImagem(void){
 	limparBuffer();
 
 	/* leitura das dimensões da imagem a ser criada */
-	printf("  Dimensoes\n");
-
-	printf("    Largura: ");
+	printf("  Largura: ");
 	scanf(" %d", &imagem.lar);
 
-	printf("    Altura:  ");
+	printf("  Altura:  ");
 	scanf(" %d", &imagem.alt);
 
 	imagem.numDePixels = imagem.lar * imagem.alt;
@@ -177,6 +175,71 @@ void salvarImagem(Imagem *imagem){
 
 	/* fechando arquivo */
 	fclose(imagem->arquivo);
+}
+
+/****************************************************
+Função: lerImagem
+Parâmetros: nenhum
+Retorno: tipo Imagem
+
+Descrição: lê um arquivo ppm, atribui a uma estrutura Imagem e 
+retorna essa estrutura.
+*****************************************************/
+Imagem abrirImagem(void){
+	/* recebendo caminho da imagem */
+	char caminho[100];
+	limparBuffer();
+	printf("  Caminho: ");
+	fgets(caminho, 100, stdin);
+
+	/* removendo o '\n' da string caminho */
+	for (int i = 0; i < strlen(caminho); ++i){
+		if (caminho[i] == '\n')
+			caminho[i] = '\0';
+	}
+
+	Imagem imagem;
+	imagem.arquivo = fopen(caminho, "r");
+	if (imagem.arquivo == NULL){
+		printf("%s: NULL\n", caminho);
+		return imagem;
+	}
+
+	/* leitura de conteudo */
+	fscanf(imagem.arquivo, "%s\n", imagem.id);
+	fscanf(imagem.arquivo, "%d %d", &imagem.lar, &imagem.alt);
+	imagem.numDePixels = imagem.lar * imagem.alt;
+	fscanf(imagem.arquivo, "%d", &imagem.max);
+
+	/* alocação dinâmica da matriz pixels */
+	imagem.pixels = (Pixel **) safeMalloc(imagem.alt * sizeof(Pixel *));
+	for (int i = 0; i < imagem.alt; i++){
+		imagem.pixels[i] = (Pixel *) safeCalloc(imagem.lar, sizeof(Pixel));
+	}
+
+	/* lendo pixels da imagem e atribuindo à matriz */
+	for (int i = 0; i < imagem.alt; ++i){
+		for (int j = 0; j < imagem.lar; ++j){
+			fscanf(imagem.arquivo, "%d %d %d\n",
+				&imagem.pixels[i][j].r,
+				&imagem.pixels[i][j].g,
+				&imagem.pixels[i][j].b);
+		}
+	}
+
+	/* atribuindo a cor preta ao pincel */
+	imagem.cor.r = 0;
+	imagem.cor.g = 0;
+	imagem.cor.b = 0;
+
+	strcpy(imagem.nomeDoArquivo, "./imagens/"); // toda imagem gerada será salva na pasta imagens
+
+	/* inicia uma estrutura de desenho */
+	imagem.desenho = criarDesenho();
+
+	fclose(imagem.arquivo);
+
+	return imagem;
 }
 
 /****************************************************

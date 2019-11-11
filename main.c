@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include "struct.h"
-#include "default.h"
+#include "func.h"
 
 void imprimirApresentacao();
 

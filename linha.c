@@ -1,6 +1,6 @@
 #include "linha.h"
 #include "struct.h"
-#include "default.h"
+#include "func.h"
 
 /****************************************************
 Função: criarLinha

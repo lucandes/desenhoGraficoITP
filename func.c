@@ -1,11 +1,57 @@
-#include "default.h"
-#include "struct.h"
-#include "safestdlib.h"
-#include "linha.h"
-
 #include <stdio.h>
 #include <string.h>
 
+#include "struct.h"
+#include "imagem.h"
+#include "linha.h"
+#include "safestdlib.h"
+#include "func.h"
+
+
+/****************************************************
+Função: criarCor
+Parâmetros: nenhum
+Retorno: tipo Cor
+
+Descrição: cria uma cor com valores RGB informados pelo usuário
+*****************************************************/
+Cor criarCor(void){
+	Cor cor;
+	int r,g,b;
+
+	limparBuffer();
+
+	printf("  Valores de cor RGB\n");
+
+	printf("    R: ");
+	scanf(" %d", &r);
+
+	printf("    G: ");
+	scanf(" %d", &g);
+
+	printf("    B: ");
+	scanf(" %d", &b);
+
+	cor.r = r;
+	cor.g = g;
+	cor.b = b;
+
+	return cor;
+}
+
+/****************************************************
+Função: pintarPixel
+Parâmetros: coordenadas do pixel, matriz tipo Pixel, cor tipo Cor
+Retorno: nenhum
+
+Descrição: altera a cor do pixel na matriz
+*****************************************************/
+void pintarPixel(int x, int y, Pixel **pixels, Cor cor){
+	// invertido pois a matriz foi inicializada a partir da altura
+	pixels[y][x].r = cor.r;
+	pixels[y][x].g = cor.g;
+	pixels[y][x].b = cor.b;
+}
 
 /****************************************************
 Função: liberaAD
@@ -19,43 +65,6 @@ void liberarAD(Imagem *imagem, Pixel **pixels){
 	for (int i = 0; i < imagem->alt; ++i)
 		free(pixels[i]);
 	free(pixels);
-}
-
-/****************************************************
-Função: mudarCor
-Parâmetros: ponteiro tipo Imagem
-Retorno: nenhum
-
-Descrição: altera a cor do pincel da imagem
-*****************************************************/
-void mudarCor(Imagem *imagem){
-	Cor novaCor;
-	novaCor = criarCor();
-
-		imagem->cor.r = novaCor.r;
-		imagem->cor.g = novaCor.g;
-		imagem->cor.b = novaCor.b;
-}
-
-/****************************************************
-Função: limparImagem
-Parâmetros: ponteiro tipo Imagem
-Retorno: nenhum
-
-Descrição: limpa toda a imagem para uma cor especificada
-*****************************************************/
-void limparImagem(Imagem *imagem){
-	Cor cor = criarCor();
-
-	for (int i = 0; i < imagem->alt; ++i)
-		for (int j = 0; j < imagem->lar; ++j){
-			imagem->pixels[i][j].r = cor.r;
-			imagem->pixels[i][j].g = cor.g;
-			imagem->pixels[i][j].b = cor.b;
-		}
-
-	/* todos os desenhos serão apagados */
-	imagem->desenho = criarDesenho();
 }
 
 /****************************************************

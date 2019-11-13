@@ -11,23 +11,15 @@ Retorno: estrutura Imagem
 Descrição: serve para inicializar uma nova imagem, recebendo as entradas necessárias
 e retornando os valores atribuídos em uma estrutura do tipo Imagem.
 *****************************************************/
-Imagem criarImagem(void){
+Imagem criarImagem(int *imagemAberta, int lar, int alt){
 	Imagem imagem;
 
 	/* atribuindo configurações padrão */
 	strcpy(imagem.id, "P3");
 	imagem.max = 255;
-	strcpy(imagem.nomeDoArquivo, "./imagens/"); // toda imagem gerada será salva na pasta imagens
 
-	limparBuffer();
-
-	/* leitura das dimensões da imagem a ser criada */
-	printf("  Largura: ");
-	scanf(" %d", &imagem.lar);
-
-	printf("  Altura:  ");
-	scanf(" %d", &imagem.alt);
-
+	imagem.lar = lar;
+	imagem.alt = alt;
 	imagem.numDePixels = imagem.lar * imagem.alt;
 
 	/* alocação dinâmica da matriz pixels */
@@ -51,6 +43,8 @@ Imagem criarImagem(void){
 	/* inicia uma estrutura de desenho */
 	imagem.desenho = criarDesenho();
 
+	*imagemAberta = 1;
+
 	return imagem;
 }
 
@@ -62,23 +56,19 @@ Retorno: tipo Imagem
 Descrição: lê um arquivo ppm, atribui a uma estrutura Imagem e 
 retorna essa estrutura.
 *****************************************************/
-Imagem abrirImagem(void){
-	/* recebendo caminho da imagem */
-	char caminho[100];
-	limparBuffer();
-	printf("  Caminho: ");
-	fgets(caminho, 100, stdin);
-
+Imagem abrirImagem(int *imagemAberta, char caminho[100]){
 	/* removendo o '\n' da string caminho */
-	for (int i = 0; i < strlen(caminho); ++i){
+	/*for (int i = 0; i < strlen(caminho); ++i){
 		if (caminho[i] == '\n')
 			caminho[i] = '\0';
-	}
+	}*/
+	caminho[strlen(caminho) - 1] = '\0';
 
 	Imagem imagem;
 	imagem.arquivo = fopen(caminho, "r");
 	if (imagem.arquivo == NULL){
 		printf("%s: NULL\n", caminho);
+		*imagemAberta = 0;
 		return imagem;
 	}
 
@@ -109,12 +99,12 @@ Imagem abrirImagem(void){
 	imagem.cor.g = 0;
 	imagem.cor.b = 0;
 
-	strcpy(imagem.nomeDoArquivo, "./imagens/"); // toda imagem gerada será salva na pasta imagens
-
 	/* inicia uma estrutura de desenho */
 	imagem.desenho = criarDesenho();
 
 	fclose(imagem.arquivo);
+
+	*imagemAberta = 1;
 
 	return imagem;
 }
@@ -128,14 +118,10 @@ Descrição: cria um novo arquivo ppm e escreve todas as informações
 da imagem dentro dele.
 *****************************************************/
 void salvarImagem(Imagem *imagem){
-	/* recebendo nome do arquivo */
-	char arqNome[30]; 
-
-	limparBuffer();
-
-	printf("  Nome do arquivo: ");
-	scanf("%s", (char *) &arqNome);
-	strcat(imagem->nomeDoArquivo, arqNome);
+	/*  */
+	char nomeArq[50] = "./imagens/";
+	strcat(nomeArq, imagem->nomeDoArquivo);
+	strcpy(imagem->nomeDoArquivo, nomeArq);
 
 	/* criando novo arquivo */
 	imagem->arquivo = fopen(imagem->nomeDoArquivo, "w");
@@ -169,14 +155,12 @@ Retorno: nenhum
 
 Descrição: limpa toda a imagem para uma cor especificada
 *****************************************************/
-void limparImagem(Imagem *imagem){
-	Cor cor = criarCor();
-
+void limparImagem(Imagem *imagem, int r, int g, int b){
 	for (int i = 0; i < imagem->alt; ++i)
 		for (int j = 0; j < imagem->lar; ++j){
-			imagem->pixels[i][j].r = cor.r;
-			imagem->pixels[i][j].g = cor.g;
-			imagem->pixels[i][j].b = cor.b;
+			imagem->pixels[i][j].r = r;
+			imagem->pixels[i][j].g = g;
+			imagem->pixels[i][j].b = b;
 		}
 
 	/* todos os desenhos serão apagados */
@@ -229,20 +213,4 @@ void inserirDesenhos(Imagem *imagem){
 	for (int i = 0; i < imagem->desenho.numLinhas; ++i){
 		inserirLinha(imagem->desenho.linhas[i], imagem);
 	}
-}
-
-/****************************************************
-Função: mudarCor
-Parâmetros: ponteiro tipo Imagem
-Retorno: nenhum
-
-Descrição: altera a cor do pincel da imagem
-*****************************************************/
-void mudarCor(Imagem *imagem){
-	Cor novaCor;
-	novaCor = criarCor();
-
-		imagem->cor.r = novaCor.r;
-		imagem->cor.g = novaCor.g;
-		imagem->cor.b = novaCor.b;
 }

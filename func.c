@@ -19,8 +19,6 @@ Cor criarCor(void){
 	Cor cor;
 	int r,g,b;
 
-	limparBuffer();
-
 	printf("  Valores de cor RGB\n");
 
 	printf("    R: ");
@@ -100,6 +98,15 @@ void limpaConsole(void){
 	#endif
 }
 
+FILE *lerArquivo(int *lerStdin, Imagem imagem){
+	FILE *arquivo;
+	imagem.caminho[strlen(imagem.caminho) - 1] = '\0';
+
+	arquivo = fopen(imagem.caminho, "r");
+
+	return arquivo;
+}
+
 /****************************************************
 Função: executar
 Parâmetros: entrada do usuário, estrutura tipo Imagem
@@ -108,51 +115,86 @@ Retorno: nenhum
 Descrição: lê e interpreta a entrada do usuário caso a entrada
 seja compatível com um comando do programa.
 *****************************************************/
-void executar(char entrada[10], Imagem *imagem, int imagemAberta){
+void executar(char entrada[10], Imagem *imagem, int imagemAberta, int lerStdin, FILE *arqEspecificacao){
 	/* comando ajuda */
-	if (!strcmp(entrada, "ajuda")){
+	if (!strcmp(entrada, "help")){
 		printf("---------------------------------------\n");
-		printf("ajuda    (imprime a lista de comandos)\n");
-		printf("imagem   (gera uma nova imagem)\n");
-		printf("cor      (altera a cor atual do pincel)\n");
-		printf("linha    (gera uma nova linha)\n");
-		printf("desenhos (imprime os desenhos da imagem\n");
-		printf("limpar   (preenche toda a imagem)\n");
-		printf("salvar   (salva em um arquivo ppm)\n");
-		printf("abrir    (carrega uma imagem ppm)\n\n");
-		printf("sair     (encerra o programa)\n");
+		printf("ajuda     (imprime a lista de comandos)\n");
+		printf("imagem    (gera uma nova imagem)\n");
+		printf("cor       (altera a cor atual do pincel)\n");
+		printf("linha     (gera uma nova linha)\n");
+		printf("lista     (lista os desenhos da imagem\n");
+		printf("limpar    (preenche toda a imagem)\n");
+		printf("salvar    (salva em um arquivo ppm)\n");
+		printf("abrir     (carrega uma imagem ppm)\n\n");
+		printf("sair      (encerra o programa)\n");
 	}
 
 	/* comando limpar */
-	else if (!strcmp(entrada, "limpar")){
+	else if (!strcmp(entrada, "limpar") || !strcmp(entrada, "clear")){
 		if (!imagemAberta){
 			printf("Erro: imagem nao aberta\n");
 			limparBuffer();
 			return;
 		}
+		int r, g, b;
 
-		limparImagem(imagem);
+		if (lerStdin){
+			scanf(" %d %d %d", &r, &g, &b);
+		}
+		else {
+			fscanf(arqEspecificacao, " %d", &r);
+			fscanf(arqEspecificacao, " %d", &g);
+			fscanf(arqEspecificacao, " %d", &b);
+			while (getc(arqEspecificacao) != '\n'); // pegando o \n
+		}
+
+		limparImagem(imagem, r, g, b);
 	}
 
 	/* comando linha */
-	else if (!strcmp(entrada, "linha")){
+	else if (!strcmp(entrada, "linha") || !strcmp(entrada, "line")){
 		if (!imagemAberta){
 			printf("Erro: imagem nao aberta\n");
 			limparBuffer();
 			return;
 		}
+
+		Ponto p1, p2;
+
+		if (lerStdin){
+			setbuf(stdin, NULL);
+			scanf(" %d %d %d %d", &p1.x, &p1.y, &p2.x, &p2.y);
+		}
+		else {
+			fscanf(arqEspecificacao, " %d %d %d %d\n", &p1.x, &p1.y, &p2.x, &p2.y);
+		}
 		
-		criarLinha(imagem);
+		criarLinha(imagem, p1, p2);
 	}
 
 	/* comando cor */
-	else if (!strcmp(entrada, "cor")){
+	else if (!strcmp(entrada, "cor") || !strcmp(entrada, "color")){
 		// pode ser alterado com a imagem fechada
-		mudarCor(imagem);
+		int r, g, b;
+
+		if (lerStdin){
+			scanf(" %d %d %d", &r, &g, &b);
+		}
+		else {
+			fscanf(arqEspecificacao, " %d", &r);
+			fscanf(arqEspecificacao, " %d", &g);
+			fscanf(arqEspecificacao, " %d", &b);
+			while (getc(arqEspecificacao) != '\n'); // pegando o \n
+		}
+
+		imagem->cor.r = r;
+		imagem->cor.g = g;
+		imagem->cor.b = b;
 	}
 
 	/* comando desenhos */
-	else if (!strcmp(entrada, "desenhos")){
+	else if (!strcmp(entrada, "listar") || !strcmp(entrada, "list")){
 		if (!imagemAberta){
 			printf("Erro: imagem nao aberta\n");
 			limparBuffer();

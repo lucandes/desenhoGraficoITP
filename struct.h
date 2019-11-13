@@ -57,6 +57,7 @@ Descrição: armazena informações sobre a imagem aberta
 typedef struct imagem {
 	FILE *arquivo;
 	char nomeDoArquivo[50];
+	char caminho[100];
 	
 	char id[3];
 	int lar, alt;

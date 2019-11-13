@@ -10,23 +10,15 @@ Retorno: nenhum
 Descrição: recebe os pontos do usuário e caso sejam válidos, 
 cria uma linha e armazena na estrutura de desenhos da imagem
 *****************************************************/
-void criarLinha(Imagem *imagem){
+void criarLinha(Imagem *imagem, Ponto p1, Ponto p2){
 	Linha linha;
 
-	limparBuffer();
-
 	/* leitura das coordenadas */
-	printf("  Inicio:\n");
-	printf("    x: ");
-	scanf(" %d", &linha.inicio.x);
-	printf("    y: ");
-	scanf(" %d", &linha.inicio.y);
+	linha.inicio.x = p1.x;
+	linha.inicio.y = p1.y;
 
-	printf("  Final:\n");
-	printf("    x: ");
-	scanf(" %d", &linha.fim.x);
-	printf("    y: ");
-	scanf(" %d", &linha.fim.y);
+	linha.fim.x = p2.x;
+	linha.fim.y = p2.y;
 
 	int maxX = imagem->lar - 1;
 	int maxY = imagem->alt - 1;

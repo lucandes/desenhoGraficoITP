@@ -12,7 +12,8 @@ void pintarPixel(int x, int y, Pixel **pixels, Cor cor);
 void liberarAD(Imagem *imagem, Pixel **pixels);
 void limparBuffer(void);
 void limpaConsole(void);
-FILE *lerArquivo(int *lerStdin, Imagem imagem);
-void executar(char entrada[10], Imagem *imagem, int imagemAberta, int lerStdin, FILE *arqEspecificacao);
+FILE *lerArquivo(int *temArquivo, Imagem imagem);
+int lerDoArquivo(FILE *arquivo, char *entrada);
+void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo, FILE *arqEspecificacao);
 
 #endif

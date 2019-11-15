@@ -46,7 +46,6 @@ nessa estrutura, tornando sua manipulação mais eficiente
 *********************/
 typedef struct desenho {
 	Linha linhas[100];
-
 	int numLinhas;
 }Desenho;
 
@@ -68,8 +67,5 @@ typedef struct imagem {
 	Cor cor;
 	Desenho desenho;
 }Imagem;
-
-/* funções referentes as estruturas declaradas */
-
 
 #endif

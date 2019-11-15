@@ -119,7 +119,7 @@ da imagem dentro dele.
 *****************************************************/
 void salvarImagem(Imagem *imagem){
 	/*  */
-	char nomeArq[50] = "./imagens/";
+	char nomeArq[50] = "./galeria/";
 	strcat(nomeArq, imagem->nomeDoArquivo);
 	strcpy(imagem->nomeDoArquivo, nomeArq);
 

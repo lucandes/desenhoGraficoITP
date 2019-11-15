@@ -98,13 +98,55 @@ void limpaConsole(void){
 	#endif
 }
 
-FILE *lerArquivo(int *lerStdin, Imagem imagem){
+/****************************************************
+Função: lerArquivo
+Parâmetros: ponteiro de int temArquivo, tipo Imagem
+Retorno: ponteiro tipo FILE
+
+Descrição: abre um arquivo no caminho determinado pelo usuário,
+verifica se o foi aberto corretamente e retorna o arquivo.
+*****************************************************/
+FILE *lerArquivo(int *temArquivo, Imagem imagem){
 	FILE *arquivo;
-	imagem.caminho[strlen(imagem.caminho) - 1] = '\0';
 
 	arquivo = fopen(imagem.caminho, "r");
 
+	if (!arquivo){
+		*temArquivo = 0;
+		fclose(arquivo);
+	}
+	else
+		*temArquivo = 1;
+
 	return arquivo;
+}
+
+/****************************************************
+Função: lerDoArquivo
+Parâmetros: ponteiro de arquivo FILE, string entrada
+Retorno: int eof
+
+Descrição: lê o arquivo até encontrar um espaço, quebra de linha ou EOF 
+(fim do arquivo). Retorna 1 se o arquivo acabou e 0 se ainda possui conteúdo.
+*****************************************************/
+int lerDoArquivo(FILE *arquivo, char *entrada){
+	char c = 'a'; // iniciado com char genérico para satisfazer a condição do loop
+	int eof;
+
+	/* será repetido até encontrar um espaço ou quebra de linha no arquivo */
+	for(int i = 0; c != ' ' && c != '\n'; i++){
+		c = getc(arquivo);
+
+		/* se o char for letra será inserido na string, se for 
+		   espaço ou quebra de linha o '\0' é inserido */
+		c == ' ' || c == '\n' ? (entrada[i] = '\0') : (entrada[i] = c);
+
+		/* verifica se chegou ao fim do arquivo */
+		if (feof(arquivo))
+			return 1;
+	}
+
+	return 0;
 }
 
 /****************************************************
@@ -115,9 +157,12 @@ Retorno: nenhum
 Descrição: lê e interpreta a entrada do usuário caso a entrada
 seja compatível com um comando do programa.
 *****************************************************/
-void executar(char entrada[10], Imagem *imagem, int imagemAberta, int lerStdin, FILE *arqEspecificacao){
+void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo, FILE *arqEspecificacao){
 	/* comando ajuda */
-	if (!strcmp(entrada, "help")){
+	if (!strcmp(entrada, "ajuda") || !strcmp(entrada, "help")){
+		if (temArquivo)
+			printf("\n"); // quebra de linha final
+
 		printf("---------------------------------------\n");
 		printf("ajuda     (imprime a lista de comandos)\n");
 		printf("imagem    (gera uma nova imagem)\n");
@@ -137,16 +182,15 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta, int lerStdin, 
 			limparBuffer();
 			return;
 		}
+
 		int r, g, b;
 
-		if (lerStdin){
+		if (!temArquivo){
 			scanf(" %d %d %d", &r, &g, &b);
 		}
 		else {
-			fscanf(arqEspecificacao, " %d", &r);
-			fscanf(arqEspecificacao, " %d", &g);
-			fscanf(arqEspecificacao, " %d", &b);
-			while (getc(arqEspecificacao) != '\n'); // pegando o \n
+			fscanf(arqEspecificacao, " %d %d %d\n", &r, &g, &b);
+			printf(" %d %d %d\n", r, g, b);
 		}
 
 		limparImagem(imagem, r, g, b);
@@ -162,12 +206,13 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta, int lerStdin, 
 
 		Ponto p1, p2;
 
-		if (lerStdin){
+		if (!temArquivo){
 			setbuf(stdin, NULL);
 			scanf(" %d %d %d %d", &p1.x, &p1.y, &p2.x, &p2.y);
 		}
 		else {
 			fscanf(arqEspecificacao, " %d %d %d %d\n", &p1.x, &p1.y, &p2.x, &p2.y);
+			printf(" %d %d %d %d\n", p1.x, p1.y, p2.x, p2.y);
 		}
 		
 		criarLinha(imagem, p1, p2);
@@ -178,14 +223,12 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta, int lerStdin, 
 		// pode ser alterado com a imagem fechada
 		int r, g, b;
 
-		if (lerStdin){
+		if (!temArquivo){
 			scanf(" %d %d %d", &r, &g, &b);
 		}
 		else {
-			fscanf(arqEspecificacao, " %d", &r);
-			fscanf(arqEspecificacao, " %d", &g);
-			fscanf(arqEspecificacao, " %d", &b);
-			while (getc(arqEspecificacao) != '\n'); // pegando o \n
+			fscanf(arqEspecificacao, " %d %d %d\n", &r, &g, &b);
+			printf(" %d %d %d\n", r, g, b);
 		}
 
 		imagem->cor.r = r;
@@ -200,12 +243,17 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta, int lerStdin, 
 			limparBuffer();
 			return;
 		}
+		if (temArquivo)
+			printf("\n"); // quebra de linha final
 
 		listarDesenhos(imagem->desenho);
 	}
 
 	/* comando inválido */
 	else {
+		if (temArquivo)
+			printf("\n"); // quebra de linha final
+
 		printf("Erro: comando invalido. Digite 'ajuda' para ver a lista de comandos\n");
 		limparBuffer();
 	}

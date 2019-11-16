@@ -42,10 +42,7 @@ int main(){
 		/* aqui são checados apenas os comandos principais */
 		if (!strcmp(entrada, "imagem") || !strcmp(entrada, "image")){
 			if (!temArquivo){
-				printf("  Largura: ");
 				scanf(" %d", &imagem.lar);
-
-				printf("  Altura:  ");
 				scanf(" %d", &imagem.alt);
 			}
 			else {
@@ -58,7 +55,7 @@ int main(){
 
 		else if (!strcmp(entrada, "abrir") || !strcmp(entrada, "open")){
 			if (!temArquivo){
-				printf("  Caminho: ");
+				getc(stdin); // pegando o espaço
 				fgets(imagem.caminho, 100, stdin);
 			}
 			else {
@@ -74,8 +71,13 @@ int main(){
 		}
 
 		else if (!strcmp(entrada, "sair") || !strcmp(entrada, "quit")){
-			if (imagemAberta)
+			if (imagemAberta){
 				liberarAD(&imagem, imagem.pixels);
+
+				/* liberando alocação de polígonos */
+				for (int i = 0; i < imagem.desenho.numPoligonos; ++i)
+					free(imagem.desenho.poligonos[i].linhas);
+			}
 			if (temArquivo){
 				fclose(arqEspecificacao);
 				printf("\n"); // quebra de linha final

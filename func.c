@@ -4,6 +4,7 @@
 #include "struct.h"
 #include "imagem.h"
 #include "linha.h"
+#include "poligono.h"
 #include "safestdlib.h"
 #include "func.h"
 
@@ -164,15 +165,17 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo
 			printf("\n"); // quebra de linha final
 
 		printf("---------------------------------------\n");
-		printf("ajuda     (imprime a lista de comandos)\n");
-		printf("imagem    (gera uma nova imagem)\n");
-		printf("cor       (altera a cor atual do pincel)\n");
-		printf("linha     (gera uma nova linha)\n");
-		printf("lista     (lista os desenhos da imagem\n");
-		printf("limpar    (preenche toda a imagem)\n");
-		printf("salvar    (salva em um arquivo ppm)\n");
-		printf("abrir     (carrega uma imagem ppm)\n\n");
-		printf("sair      (encerra o programa)\n");
+		printf("ajuda                         (imprime a lista de comandos)\n");
+		printf("imagem <lar> <alt>            (gera uma nova imagem)\n");
+		printf("cor <r> <g> <b>               (altera a cor atual do pincel)\n");
+		printf("linha <x1> <y1> <x2> <y2>     (gera uma nova linha)\n");
+		printf("poligono <N> <p1> ... <pN>    (gera um novo poligono)\n");
+		printf("lista                         (lista os desenhos da imagem)\n");
+		printf("limpar <r> <g> <b>            (preenche toda a imagem)\n");
+		printf("salvar <nome_do_arquivo.ppm>  (salva em um arquivo ppm)\n");
+		printf("abrir  <nome_do_arquivo.ppm>  (carrega uma imagem ppm)\n");
+		printf("ler    <nome_do_arquivo>      (le um arquivo de especificacao)\n");
+		printf("sair                          (encerra o programa)\n\n");
 	}
 
 	/* comando limpar */
@@ -206,6 +209,7 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo
 
 		Ponto p1, p2;
 
+		/* leitura de entrada */
 		if (!temArquivo){
 			setbuf(stdin, NULL);
 			scanf(" %d %d %d %d", &p1.x, &p1.y, &p2.x, &p2.y);
@@ -214,8 +218,82 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo
 			fscanf(arqEspecificacao, " %d %d %d %d\n", &p1.x, &p1.y, &p2.x, &p2.y);
 			printf(" %d %d %d %d\n", p1.x, p1.y, p2.x, p2.y);
 		}
+
+		/* verifica se as entradas são válidas */
+		int maxX = imagem->lar - 1;
+		int maxY = imagem->alt - 1;
 		
-		criarLinha(imagem, p1, p2);
+		if (p1.x > maxX || p2.x > maxX ||
+			p1.y > maxY || p2.y > maxY){
+			printf("Erro: coordenada invalida inserida\n");
+			return;
+		}
+		
+		Linha l;
+		l = criarLinha(p1, p2, imagem->cor);
+
+		/* adicionando linha à estrutura linha */
+		imagem->desenho.linhas[imagem->desenho.numLinhas] = l;
+		imagem->desenho.numLinhas += 1;
+	}
+
+	/* comando poligono */
+	else if (!strcmp(entrada, "poligono") || !strcmp(entrada, "polygon")){
+		if (!imagemAberta){
+			printf("Erro: imagem nao aberta\n");
+			limparBuffer();
+			return;
+		}
+
+		int numFaces;
+		int maxX = imagem->lar - 1;
+		int maxY = imagem->alt - 1;
+
+		/* leitura de numero de faces do polígono */
+		if (!temArquivo){
+			setbuf(stdin, NULL);
+			scanf(" %d", &numFaces);
+		}
+		else {
+			fscanf(arqEspecificacao, " %d", &numFaces);
+			printf(" %d\n", numFaces);
+		}
+
+		Ponto pontos[numFaces];
+
+		/* leitura de pontos*/
+		if (!temArquivo){
+			for (int i = 0; i < numFaces; ++i){
+				scanf(" %d %d", &pontos[i].x, &pontos[i].y);
+
+				if (pontos[i].x > maxX || pontos[i].y > maxY){
+					printf("Erro: coordenada invalida inserida\n");
+					return;
+				}
+			}
+		}
+		else {
+			for (int i = 0; i < numFaces; ++i){
+				fscanf(arqEspecificacao, " %d %d", &pontos[i].x, &pontos[i].y);
+
+				if (pontos[i].x > maxX || pontos[i].y > maxY){
+					printf("Erro: coordenada invalida inserida\n");
+					while (getc(arqEspecificacao) != '\n');
+					return;
+				}
+			}
+
+			// ler quebra de linha
+			while (getc(arqEspecificacao) != '\n');
+		}
+		
+		Poligono pol;
+		pol = criarPoligono(numFaces, pontos, imagem->cor);
+
+		/* adicionando poligono à estrutura de desenhos */
+		int n = imagem->desenho.numPoligonos;
+		imagem->desenho.poligonos[n] = pol;
+		imagem->desenho.numPoligonos += 1;
 	}
 
 	/* comando cor */

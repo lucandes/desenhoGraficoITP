@@ -1,5 +1,4 @@
 #include "linha.h"
-#include "struct.h"
 #include "func.h"
 
 /****************************************************
@@ -10,7 +9,7 @@ Retorno: nenhum
 Descrição: recebe os pontos do usuário e caso sejam válidos, 
 cria uma linha e armazena na estrutura de desenhos da imagem
 *****************************************************/
-void criarLinha(Imagem *imagem, Ponto p1, Ponto p2){
+Linha criarLinha(Ponto p1, Ponto p2, Cor cor){
 	Linha linha;
 
 	/* leitura das coordenadas */
@@ -20,20 +19,9 @@ void criarLinha(Imagem *imagem, Ponto p1, Ponto p2){
 	linha.fim.x = p2.x;
 	linha.fim.y = p2.y;
 
-	int maxX = imagem->lar - 1;
-	int maxY = imagem->alt - 1;
-
-	/* se alguma entrada ultrapassa as dimensões da imagem */
-	if (linha.inicio.x > maxX || linha.fim.x > maxX ||
-		linha.inicio.y > maxY || linha.fim.y > maxY){
-		printf("Erro: coordenada invalida inserida\n");
-		return;
-	}
-
-	linha.cor = imagem->cor;
-	/* adicionando linha à estrutura linha */
-	imagem->desenho.linhas[imagem->desenho.numLinhas] = linha;
-	imagem->desenho.numLinhas += 1;
+	linha.cor = cor;
+	
+	return linha;
 }	
 
 /****************************************************

@@ -33,11 +33,17 @@ typedef struct ponto {
 Estrutura: Linha
 Descrição: armazena informações sobre linhas na imagem
 *********************/
-typedef struct {
+typedef struct linha {
 	Ponto inicio;
 	Ponto fim;
 	Cor cor;
 }Linha;
+
+typedef struct poligono{
+	int numFaces;
+	Ponto *pontos; // será alocado dinamicamente com o numero de pontos
+	Linha *linhas; // será alocado dinamicamente com o numero de faces
+}Poligono;
 
 /*********************
 Estrutura: Desenho
@@ -47,6 +53,9 @@ nessa estrutura, tornando sua manipulação mais eficiente
 typedef struct desenho {
 	Linha linhas[100];
 	int numLinhas;
+
+	Poligono poligonos[100];
+	int numPoligonos;
 }Desenho;
 
 /*********************

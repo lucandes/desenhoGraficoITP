@@ -1,9 +1,9 @@
-#include "struct.h"
-
 #ifndef LINHA_H
 #define LINHA_H
 
-void criarLinha(Imagem *imagem, Ponto p1, Ponto p2);
+#include "struct.h"
+
+Linha criarLinha(Ponto p1, Ponto p2, Cor cor);
 void inserirLinha(Linha linha, Imagem *imagem);
 
 #endif

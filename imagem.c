@@ -2,6 +2,7 @@
 #include "struct.h"
 #include "func.h"
 #include "linha.h"
+#include "poligono.h"
 
 /****************************************************
 Função: criarImagem
@@ -67,7 +68,7 @@ Imagem abrirImagem(int *imagemAberta, char caminho[100]){
 	Imagem imagem;
 	imagem.arquivo = fopen(caminho, "r");
 	if (imagem.arquivo == NULL){
-		printf("%s: NULL\n", caminho);
+		printf("'%s': NULL\n", caminho);
 		*imagemAberta = 0;
 		return imagem;
 	}
@@ -163,6 +164,12 @@ void limparImagem(Imagem *imagem, int r, int g, int b){
 			imagem->pixels[i][j].b = b;
 		}
 
+	/* liberando alocação de polígonos */
+	if (imagem->desenho.numPoligonos > 0){
+		for (int i = 0; i < imagem->desenho.numPoligonos; ++i)
+			free(imagem->desenho.poligonos[i].linhas);
+	}
+
 	/* todos os desenhos serão apagados */
 	imagem->desenho = criarDesenho();
 }
@@ -178,6 +185,7 @@ Desenho criarDesenho(void){
 	Desenho d;
 
 	d.numLinhas = 0;
+	d.numPoligonos = 0;
 
 	return d;
 };
@@ -198,6 +206,19 @@ void listarDesenhos(Desenho d){
 			d.linhas[i].inicio.y,
 			d.linhas[i].fim.x,
 			d.linhas[i].fim.y);
+
+	/* listar poligonos */
+	for (int i = 0; i < d.numPoligonos; ++i){
+		printf("poligono %02d -", i+1);
+		
+		for (int j = 0; j < d.poligonos[i].numFaces; ++j){
+			printf(" p%d (%d,%d)", 
+				j+1,
+				d.poligonos[i].pontos[j].x,
+				d.poligonos[i].pontos[j].y);
+		}
+	}
+		printf("\n");
 }
 
 /****************************************************
@@ -212,5 +233,10 @@ void inserirDesenhos(Imagem *imagem){
 	/* inserindo linhas */
 	for (int i = 0; i < imagem->desenho.numLinhas; ++i){
 		inserirLinha(imagem->desenho.linhas[i], imagem);
+	}
+
+	/* inserindo poligonos */
+	for (int i = 0; i < imagem->desenho.numPoligonos; ++i){
+		inserirPoligono(imagem->desenho.poligonos[i], imagem);
 	}
 }

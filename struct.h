@@ -41,8 +41,8 @@ typedef struct linha {
 
 typedef struct poligono{
 	int numFaces;
-	Ponto *pontos; // será alocado dinamicamente com o numero de pontos
-	Linha *linhas; // será alocado dinamicamente com o numero de faces
+	Ponto pontos[100];
+	Linha linhas[100];
 }Poligono;
 
 /*********************

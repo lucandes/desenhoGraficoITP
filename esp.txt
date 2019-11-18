@@ -1,0 +1,10 @@
+abrir ./galeria/imagem.ppm
+limpar 0 0 50
+cor 200 0 0
+poligono 3 60 70 130 80 70 246
+cor 0 200 0
+poligono 4 65 222 299 299 15 222 265 31
+cor 255 255 255
+poligono 5 20 56 40 122 74 268 95 39 255 255
+listar
+salvar img.ppm

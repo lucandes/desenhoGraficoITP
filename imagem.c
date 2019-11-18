@@ -58,17 +58,10 @@ Descrição: lê um arquivo ppm, atribui a uma estrutura Imagem e
 retorna essa estrutura.
 *****************************************************/
 Imagem abrirImagem(int *imagemAberta, char caminho[100]){
-	/* removendo o '\n' da string caminho */
-	/*for (int i = 0; i < strlen(caminho); ++i){
-		if (caminho[i] == '\n')
-			caminho[i] = '\0';
-	}*/
-	caminho[strlen(caminho) - 1] = '\0';
 
 	Imagem imagem;
 	imagem.arquivo = fopen(caminho, "r");
 	if (imagem.arquivo == NULL){
-		printf("'%s': NULL\n", caminho);
 		*imagemAberta = 0;
 		return imagem;
 	}
@@ -119,7 +112,7 @@ Descrição: cria um novo arquivo ppm e escreve todas as informações
 da imagem dentro dele.
 *****************************************************/
 void salvarImagem(Imagem *imagem){
-	/*  */
+	/* definindo a pasta galeria como local de salvamento */
 	char nomeArq[50] = "./galeria/";
 	strcat(nomeArq, imagem->nomeDoArquivo);
 	strcpy(imagem->nomeDoArquivo, nomeArq);
@@ -144,9 +137,6 @@ void salvarImagem(Imagem *imagem){
 				imagem->pixels[x][y].b);
 		}
 	}
-
-	/* fechando arquivo */
-	fclose(imagem->arquivo);
 }
 
 /****************************************************
@@ -217,8 +207,8 @@ void listarDesenhos(Desenho d){
 				d.poligonos[i].pontos[j].x,
 				d.poligonos[i].pontos[j].y);
 		}
-	}
 		printf("\n");
+	}
 }
 
 /****************************************************

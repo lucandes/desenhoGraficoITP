@@ -25,7 +25,7 @@ int main(){
 
 			/* se o arquivo chegou ao fim */
 			if (eof){
-				printf("Arquivo lido com sucesso!\n");
+				printf("Arquivo lido com sucesso!\n\n");
 				temArquivo = 0;
 				continue;
 			}
@@ -41,6 +41,10 @@ int main(){
 
 		/* aqui são checados apenas os comandos principais */
 		if (!strcmp(entrada, "imagem") || !strcmp(entrada, "image")){
+			if (imagemAberta){
+				liberarAD(&imagem, imagem.pixels);
+			}
+
 			if (!temArquivo){
 				scanf(" %d", &imagem.lar);
 				scanf(" %d", &imagem.alt);
@@ -54,16 +58,22 @@ int main(){
 		}
 
 		else if (!strcmp(entrada, "abrir") || !strcmp(entrada, "open")){
+			if (imagemAberta){
+				liberarAD(&imagem, imagem.pixels);
+			}
+
 			if (!temArquivo){
-				getc(stdin); // pegando o espaço
+				getc(stdin); // pegando o espaçom
 				fgets(imagem.caminho, 100, stdin);
 			}
 			else {
 				fgets(imagem.caminho, 100, arqEspecificacao);
+				imagem.caminho[strlen(imagem.caminho) - 1] = '\0';
 				printf(" %s\n", imagem.caminho);
 			}
 
 			imagem = abrirImagem(&imagemAberta, imagem.caminho);
+			
 			if (!imagemAberta){
 				printf("Erro: nao foi possivel abrir a imagem\n");
 				continue;
@@ -73,11 +83,8 @@ int main(){
 		else if (!strcmp(entrada, "sair") || !strcmp(entrada, "quit")){
 			if (imagemAberta){
 				liberarAD(&imagem, imagem.pixels);
-
-				/* liberando alocação de polígonos */
-				for (int i = 0; i < imagem.desenho.numPoligonos; ++i)
-					free(imagem.desenho.poligonos[i].linhas);
 			}
+
 			if (temArquivo){
 				fclose(arqEspecificacao);
 				printf("\n"); // quebra de linha final
@@ -94,16 +101,17 @@ int main(){
 			}
 
 			if (!temArquivo){
-				limparBuffer();
-				printf("  Nome do arquivo: ");
+				getc(stdin); // pegando o espaço
 				fgets(imagem.nomeDoArquivo, 50, stdin);
+				imagem.nomeDoArquivo[strlen(imagem.nomeDoArquivo) - 1] = '\0';
 			}
 			else {
 				fgets(imagem.nomeDoArquivo, 50, arqEspecificacao);
+				imagem.nomeDoArquivo[strlen(imagem.nomeDoArquivo) - 1] = '\0';
 				printf(" %s\n", imagem.nomeDoArquivo);
 			}
 
-			imagem.nomeDoArquivo[strlen(imagem.nomeDoArquivo) - 1] = '\0';
+			
 			salvarImagem(&imagem);
 		}
 
@@ -133,5 +141,6 @@ void imprimirApresentacao(){
 	printf("DESENHO GRAFICO - PROJETO UNIDADE III\n");
 	printf("INTRODUCAO AS TECNICAS DE PROGRAMACAO\n\n");
 	printf("Aluno: Lucas Fernandes de Oliveira\n");
-	printf("*************************************\n\n");
+	printf("*************************************\n");
+	printf("Digite 'ajuda' para ver a lista de comandos\n\n");
 }

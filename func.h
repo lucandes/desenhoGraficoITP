@@ -11,6 +11,7 @@ Cor criarCor(void);
 void pintarPixel(int x, int y, Pixel **pixels, Cor cor);
 void liberarAD(Imagem *imagem, Pixel **pixels);
 void limparBuffer(void);
+void limparFileBuffer(FILE *arq);
 void limpaConsole(void);
 FILE *lerArquivo(int *temArquivo, Imagem imagem);
 int lerDoArquivo(FILE *arquivo, char *entrada);

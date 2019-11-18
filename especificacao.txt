@@ -1,8 +1,0 @@
-imagem 600 600
-limpar 50 90 80
-linha 30 438 554 200
-cor 0 100 50
-linha 529 263 2 50
-cor 200 0 0
-linha 528 262 1 49
-salvar arqesp.ppm

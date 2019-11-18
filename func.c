@@ -71,13 +71,27 @@ Função: limparBuffer
 Parâmetros: nenhum
 Retorno: nenhum
 
-Descrição: responsável por limpar o buffer, deve ser chamada
+Descrição: responsável por limpar o buffer de entrada, deve ser chamada
 após um comando inválido, desconsiderando todas as demais 
 informações inseridas pelo usuário
 *****************************************************/
 void limparBuffer(void){
 	/* lê até encontrar uma quebra de linha */
 	while (getchar() != '\n');
+}
+
+/****************************************************
+Função: limparFileBuffer
+Parâmetros: arquivo tipo FILE
+Retorno: nenhum
+
+Descrição: responsável por limpar o buffer de entrada, deve ser chamada
+após um comando inválido, desconsiderando todas as demais 
+informações inseridas pelo usuário
+*****************************************************/
+void limparFileBuffer(FILE *arq){
+	/* lê até encontrar uma quebra de linha */
+	while (getc(arq) != '\n');
 }
 
 /****************************************************
@@ -173,8 +187,8 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo
 		printf("lista                         (lista os desenhos da imagem)\n");
 		printf("limpar <r> <g> <b>            (preenche toda a imagem)\n");
 		printf("salvar <nome_do_arquivo.ppm>  (salva em um arquivo ppm)\n");
-		printf("abrir  <nome_do_arquivo.ppm>  (carrega uma imagem ppm)\n");
-		printf("ler    <nome_do_arquivo>      (le um arquivo de especificacao)\n");
+		printf("abrir <nome_do_arquivo.ppm>   (carrega uma imagem ppm)\n");
+		printf("ler <nome_do_arquivo>         (le um arquivo de especificacao)\n");
 		printf("sair                          (encerra o programa)\n\n");
 	}
 
@@ -245,7 +259,7 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo
 			return;
 		}
 
-		int numFaces;
+		int numFaces;  
 		int maxX = imagem->lar - 1;
 		int maxY = imagem->alt - 1;
 
@@ -257,6 +271,12 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo
 		else {
 			fscanf(arqEspecificacao, " %d", &numFaces);
 			printf(" %d\n", numFaces);
+		}
+
+		/* verificando se o número de faces é válido */
+		if (numFaces < 3 || numFaces > 100){
+			printf("Erro: numero inválido de faces inserido\n");
+			temArquivo ? limparFileBuffer(arqEspecificacao) : limparBuffer();
 		}
 
 		Ponto pontos[numFaces];

@@ -17,20 +17,16 @@ Retorno: tipo Cor
 
 Descrição: cria uma cor com valores RGB informados pelo usuário
 *****************************************************/
-Cor criarCor(void){
+Cor criarCor(int temArquivo, FILE *arq){
 	Cor cor;
 	int r,g,b;
 
-	printf("  Valores de cor RGB\n");
-
-	printf("    R: ");
-	scanf(" %d", &r);
-
-	printf("    G: ");
-	scanf(" %d", &g);
-
-	printf("    B: ");
-	scanf(" %d", &b);
+	if (!temArquivo)
+		scanf(" %d %d %d", &r, &g, &b);
+	else {
+		fscanf(arq, " %d %d %d\n", &r, &g, &b);
+		printf(" %d %d %d\n", r, g, b);
+	}
 
 	cor.r = r;
 	cor.g = g;
@@ -46,11 +42,19 @@ Retorno: nenhum
 
 Descrição: altera a cor do pixel na matriz
 *****************************************************/
-void pintarPixel(int x, int y, Pixel **pixels, Cor cor){
+void pintarPixel(int x, int y, Imagem *imagem, Cor cor){
+	int maxX = imagem->lar - 1;
+	int maxY = imagem->alt - 1;
+
+	/* se o pixel a ser modificado não existir na imagem
+	a função irá ignorá-lo e modificar apenas os que existem */
+	if (x > maxX || y > maxY || x < 0 || y < 0)
+		return;
+
 	// invertido pois a matriz foi inicializada a partir da altura
-	pixels[y][x].r = cor.r;
-	pixels[y][x].g = cor.g;
-	pixels[y][x].b = cor.b;
+	imagem->pixels[y][x].r = cor.r;
+	imagem->pixels[y][x].g = cor.g;
+	imagem->pixels[y][x].b = cor.b;
 }
 
 /****************************************************
@@ -165,13 +169,60 @@ int lerDoArquivo(FILE *arquivo, char *entrada){
 	return 0;
 }
 
+int checaImagem(int imagemAberta, int temArquivo, FILE *arq){
+	if (!imagemAberta){
+			printf("Erro: imagem nao aberta\n");
+			temArquivo ? limparFileBuffer(arq): limparBuffer();
+			return 0;
+		}
+
+	return 1;
+}
+
+void lerInteiros(int *inteiros, int numInteiros, int temArquivo, FILE *arq){
+	for (int i = 0; i < numInteiros; ++i){
+		if (!temArquivo)
+			scanf(" %d", &inteiros[i]);
+		else {
+			fscanf(arq, " %d", &inteiros[i]);
+			printf(" %d", inteiros[i]);
+		}
+	}
+}
+
+void lerPontos(Ponto *pontos, int numPontos, int temArquivo, FILE *arq){
+	for (int i = 0; i < numPontos; ++i){
+		if (!temArquivo)
+			scanf(" %d %d", &pontos[i].x, &pontos[i].y);
+		else {
+			fscanf(arq, " %d %d", &pontos[i].x, &pontos[i].y);
+			printf(" %d %d", pontos[i].x, pontos[i].y);
+		}
+	}
+
+	if (temArquivo)
+		printf("\n");
+}
+
+int verificaCoordenadas(int x, int y, Imagem *imagem){
+	int maxX = imagem->lar - 1;
+	int maxY = imagem->alt - 1;
+
+	if (x > maxX || x < 0 || y > maxY || y < 0){
+		printf("Erro: coordenada invalida inserida\n");
+		return 0;
+	}
+
+	return 1;
+}
+
 /****************************************************
 Função: executar
 Parâmetros: entrada do usuário, estrutura tipo Imagem
 Retorno: nenhum
 
-Descrição: lê e interpreta a entrada do usuário caso a entrada
-seja compatível com um comando do programa.
+Descrição: lê e interpreta a entrada do usuário, caso a entrada
+seja compatível com um comando do programa, este será executado.
 *****************************************************/
 void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo, FILE *arqEspecificacao){
 	/* comando ajuda */
@@ -196,57 +247,34 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo
 
 	/* comando limpar */
 	else if (!strcmp(entrada, "limpar") || !strcmp(entrada, "clear")){
-		if (!imagemAberta){
-			printf("Erro: imagem nao aberta\n");
-			limparBuffer();
+		/* verifica se existem uma imagem aberta */
+		if (!checaImagem(imagemAberta, temArquivo, arqEspecificacao))
 			return;
-		}
 
-		int r, g, b;
+		Cor cor = criarCor(temArquivo, arqEspecificacao);
 
-		if (!temArquivo){
-			scanf(" %d %d %d", &r, &g, &b);
-		}
-		else {
-			fscanf(arqEspecificacao, " %d %d %d\n", &r, &g, &b);
-			printf(" %d %d %d\n", r, g, b);
-		}
-
-		limparImagem(imagem, r, g, b);
+		limparImagem(imagem, cor);
 	}
 
 	/* comando linha */
 	else if (!strcmp(entrada, "linha") || !strcmp(entrada, "line")){
-		if (!imagemAberta){
-			printf("Erro: imagem nao aberta\n");
-			limparBuffer();
+		/* verifica se existem uma imagem aberta */
+		if (!checaImagem(imagemAberta, temArquivo, arqEspecificacao))
 			return;
-		}
 
-		Ponto p1, p2;
+		Ponto pontos[2];
 
 		/* leitura de entrada */
-		if (!temArquivo){
-			setbuf(stdin, NULL);
-			scanf(" %d %d %d %d", &p1.x, &p1.y, &p2.x, &p2.y);
-		}
-		else {
-			fscanf(arqEspecificacao, " %d %d %d %d\n", &p1.x, &p1.y, &p2.x, &p2.y);
-			printf(" %d %d %d %d\n", p1.x, p1.y, p2.x, p2.y);
-		}
+		lerPontos(pontos, 2, temArquivo, arqEspecificacao);
 
 		/* verifica se as entradas são válidas */
-		int maxX = imagem->lar - 1;
-		int maxY = imagem->alt - 1;
-		
-		if (p1.x > maxX || p2.x > maxX ||
-			p1.y > maxY || p2.y > maxY){
-			printf("Erro: coordenada invalida inserida\n");
-			return;
+		for (int i = 0; i < 2; ++i){
+			if (!verificaCoordenadas(pontos[i].x, pontos[i].y, imagem))
+				return;
 		}
 		
 		Linha l;
-		l = criarLinha(p1, p2, imagem->cor);
+		l = criarLinha(pontos, imagem->cor);
 
 		/* adicionando linha à estrutura linha */
 		imagem->desenho.linhas[imagem->desenho.numLinhas] = l;
@@ -255,25 +283,13 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo
 
 	/* comando poligono */
 	else if (!strcmp(entrada, "poligono") || !strcmp(entrada, "polygon")){
-		if (!imagemAberta){
-			printf("Erro: imagem nao aberta\n");
-			limparBuffer();
+		/* verifica se existem uma imagem aberta */
+		if (!checaImagem(imagemAberta, temArquivo, arqEspecificacao))
 			return;
-		}
-
-		int numFaces;  
-		int maxX = imagem->lar - 1;
-		int maxY = imagem->alt - 1;
 
 		/* leitura de numero de faces do polígono */
-		if (!temArquivo){
-			setbuf(stdin, NULL);
-			scanf(" %d", &numFaces);
-		}
-		else {
-			fscanf(arqEspecificacao, " %d", &numFaces);
-			printf(" %d\n", numFaces);
-		}
+		int numFaces; 
+		lerInteiros(&numFaces, 1, temArquivo, arqEspecificacao);
 
 		/* verificando se o número de faces é válido */
 		if (numFaces < 3 || numFaces > 100){
@@ -284,30 +300,7 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo
 		Ponto pontos[numFaces];
 
 		/* leitura de pontos*/
-		if (!temArquivo){
-			for (int i = 0; i < numFaces; ++i){
-				scanf(" %d %d", &pontos[i].x, &pontos[i].y);
-
-				if (pontos[i].x > maxX || pontos[i].y > maxY){
-					printf("Erro: coordenada invalida inserida\n");
-					return;
-				}
-			}
-		}
-		else {
-			for (int i = 0; i < numFaces; ++i){
-				fscanf(arqEspecificacao, " %d %d", &pontos[i].x, &pontos[i].y);
-
-				if (pontos[i].x > maxX || pontos[i].y > maxY){
-					printf("Erro: coordenada invalida inserida\n");
-					while (getc(arqEspecificacao) != '\n');
-					return;
-				}
-			}
-
-			// ler quebra de linha
-			while (getc(arqEspecificacao) != '\n');
-		}
+		lerPontos(pontos, numFaces, temArquivo, arqEspecificacao);
 		
 		Poligono pol;
 		pol = criarPoligono(numFaces, pontos, imagem->cor);
@@ -320,45 +313,42 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo
 
 	/* comando circulo */
 	else if (!strcmp(entrada, "circulo") || !strcmp(entrada, "circle")){
-		if (!imagemAberta){
-			printf("Erro: imagem nao aberta\n");
-			limparBuffer();
+		/* verifica se existem uma imagem aberta */
+		if (!checaImagem(imagemAberta, temArquivo, arqEspecificacao))
 			return;
-		}
 
+		/* leitura do raio */
 		int raio;
+		lerInteiros(&raio, 1, temArquivo, arqEspecificacao);
+
+		/* leitura das coordenadas do centro do círculo */
 		Ponto centro;
+		lerPontos(&centro, 1, temArquivo, arqEspecificacao);
 
-		scanf(" %d %d %d", &raio, &centro.x, &centro.y);
+		temArquivo ? limparFileBuffer(arqEspecificacao) : limparBuffer();
 
-		criarCirculo(centro, raio, imagem->cor);
+		Circulo c;
+		c = criarCirculo(centro, raio, imagem->cor);
+
+		/* inserindo circulo na estrutura de desenho */
+		int n = imagem->desenho.numCirculos++; // será acrescentado mais um em numCirculos após atribuir
+		imagem->desenho.circulos[n] = c;
 	}
 
 	/* comando cor */
 	else if (!strcmp(entrada, "cor") || !strcmp(entrada, "color")){
-		// pode ser alterado com a imagem fechada
-		int r, g, b;
+		Cor cor;
+		cor = criarCor(temArquivo, arqEspecificacao);
 
-		if (!temArquivo){
-			scanf(" %d %d %d", &r, &g, &b);
-		}
-		else {
-			fscanf(arqEspecificacao, " %d %d %d\n", &r, &g, &b);
-			printf(" %d %d %d\n", r, g, b);
-		}
-
-		imagem->cor.r = r;
-		imagem->cor.g = g;
-		imagem->cor.b = b;
+		imagem->cor = cor;
 	}
 
 	/* comando desenhos */
 	else if (!strcmp(entrada, "listar") || !strcmp(entrada, "list")){
-		if (!imagemAberta){
-			printf("Erro: imagem nao aberta\n");
-			limparBuffer();
+		/* verifica se existem uma imagem aberta */
+		if (!checaImagem(imagemAberta, temArquivo, arqEspecificacao))
 			return;
-		}
+
 		if (temArquivo)
 			printf("\n"); // quebra de linha final
 
@@ -370,7 +360,7 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo
 		if (temArquivo)
 			printf("\n"); // quebra de linha final
 
-		printf("Erro: comando invalido. Digite 'ajuda' para ver a lista de comandos\n");
+		printf("Erro: '%s' comando invalido. Digite 'ajuda' para ver a lista de comandos\n", entrada);
 		limparBuffer();
 	}
 }

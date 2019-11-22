@@ -9,15 +9,15 @@ Retorno: nenhum
 Descrição: recebe os pontos do usuário e caso sejam válidos, 
 cria uma linha e armazena na estrutura de desenhos da imagem
 *****************************************************/
-Linha criarLinha(Ponto p1, Ponto p2, Cor cor){
+Linha criarLinha(Ponto pontos[2], Cor cor){
 	Linha linha;
 
 	/* leitura das coordenadas */
-	linha.inicio.x = p1.x;
-	linha.inicio.y = p1.y;
+	linha.inicio.x = pontos[0].x;
+	linha.inicio.y = pontos[0].y;
 
-	linha.fim.x = p2.x;
-	linha.fim.y = p2.y;
+	linha.fim.x = pontos[1].x;
+	linha.fim.y = pontos[1].y;
 
 	linha.cor = cor;
 	
@@ -56,7 +56,7 @@ void inserirLinha(Linha linha, Imagem *imagem){
 	int county = y1 < y2 ? 1 : -1;
 
 	/* pinta o pixel inicial */
-	pintarPixel(x1, y1, imagem->pixels, linha.cor);
+	pintarPixel(x1, y1, imagem, linha.cor);
 
 	/* enquanto a linha não alcançar o ponto final */
 	while (x1 != x2 || y1 != y2){
@@ -75,6 +75,6 @@ void inserirLinha(Linha linha, Imagem *imagem){
 			y1 += county; //avance um pixel
 		}
 
-		pintarPixel(x1, y1, imagem->pixels, linha.cor);
+		pintarPixel(x1, y1, imagem, linha.cor);
 	}
 }

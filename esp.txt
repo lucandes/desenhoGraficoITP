@@ -1,10 +1,35 @@
-abrir ./galeria/imagem.ppm
-limpar 0 0 50
-cor 200 0 0
-poligono 3 60 70 130 80 70 246
-cor 0 200 0
-poligono 4 65 222 299 299 15 222 265 31
-cor 255 255 255
-poligono 5 20 56 40 122 74 268 95 39 255 255
-listar
+imagem 100 100
+clear 100 255 100
+color 255 255 255
+circle 30 0 0
+circle 50 0 0
+circle 70 0 0
+circle 90 0 0
+circle 110 0 0
+color 0 0 0
+circle 130 0 0
+color 255 255 255
+circle 30 99 0
+circle 50 99 0
+circle 70 99 0
+circle 90 99 0
+circle 110 99 0
+color 0 0 0
+circle 130 99 0
+color 255 255 255
+circle 30 99 99
+circle 50 99 99
+circle 70 99 99
+circle 90 99 99 
+circle 110 99 99
+color 0 0 0
+circle 130 99 99
+color 255 255 255
+circle 30 0 99
+circle 50 0 99
+circle 70 0 99
+circle 90 0 99
+circle 110 0 99
+color 0 0 0
+circle 130 0 99
 salvar img.ppm

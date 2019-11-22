@@ -10,19 +10,18 @@ Circulo criarCirculo(Ponto centro, int raio, Cor cor){
 	return c;
 }
 
-// Plot eight points using circle's symmetrical property
 void plot_point(Circulo c, int x, int y, Imagem *imagem, Cor cor){
 	int xc = c.centro.x;
 	int yc = c.centro.y;
 
-	pintarPixel(xc+x, yc+y, imagem->pixels, cor);
-	pintarPixel(xc+x, yc-y, imagem->pixels, cor);
-	pintarPixel(xc+y, yc+x, imagem->pixels, cor);
-	pintarPixel(xc+y, yc-x, imagem->pixels, cor);
-	pintarPixel(xc-x, yc-y, imagem->pixels, cor);
-	pintarPixel(xc-y, yc-x, imagem->pixels, cor);
-	pintarPixel(xc-x, yc+y, imagem->pixels, cor);
-	pintarPixel(xc-y, yc+x, imagem->pixels, cor);
+	pintarPixel(xc+x, yc+y, imagem, cor);
+	pintarPixel(xc+x, yc-y, imagem, cor);
+	pintarPixel(xc+y, yc+x, imagem, cor);
+	pintarPixel(xc+y, yc-x, imagem, cor);
+	pintarPixel(xc-x, yc-y, imagem, cor);
+	pintarPixel(xc-y, yc-x, imagem, cor);
+	pintarPixel(xc-x, yc+y, imagem, cor);
+	pintarPixel(xc-y, yc+x, imagem, cor);
 }
 
 void inserirCirculo(Circulo c, Imagem *imagem){

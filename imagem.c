@@ -153,12 +153,12 @@ Retorno: nenhum
 
 Descrição: limpa toda a imagem para uma cor especificada
 *****************************************************/
-void limparImagem(Imagem *imagem, int r, int g, int b){
+void limparImagem(Imagem *imagem, Cor cor){
 	for (int i = 0; i < imagem->alt; ++i)
 		for (int j = 0; j < imagem->lar; ++j){
-			imagem->pixels[i][j].r = r;
-			imagem->pixels[i][j].g = g;
-			imagem->pixels[i][j].b = b;
+			imagem->pixels[i][j].r = cor.r;
+			imagem->pixels[i][j].g = cor.g;
+			imagem->pixels[i][j].b = cor.b;
 		}
 
 	/* liberando alocação de polígonos */
@@ -216,6 +216,15 @@ void listarDesenhos(Desenho d){
 				d.poligonos[i].pontos[j].y);
 		}
 		printf("\n");
+	}
+
+	/* listar circulos */
+	for (int i = 0; i < d.numCirculos; ++i){
+		printf("circulo %02d - raio: %d, centro: (%d,%d)\n", 
+			i+1,
+			d.circulos[i].raio,
+			d.circulos[i].centro.x,
+			d.circulos[i].centro.y);
 	}
 }
 

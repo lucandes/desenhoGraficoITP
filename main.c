@@ -41,10 +41,13 @@ int main(){
 
 		/* aqui são checados apenas os comandos principais */
 		if (!strcmp(entrada, "imagem") || !strcmp(entrada, "image")){
+			
+			/* se já existir uma imagem aberta, sua alocação será liberada */
 			if (imagemAberta){
 				liberarAD(&imagem, imagem.pixels);
 			}
 
+			/* leitura das dimensões da imagem */
 			if (!temArquivo){
 				scanf(" %d", &imagem.lar);
 				scanf(" %d", &imagem.alt);
@@ -55,16 +58,18 @@ int main(){
 			}
 
 			imagem = criarImagem(&imagemAberta, imagem.lar, imagem.alt);
-			printf("imagemAberta: %d\n", imagemAberta);
 		}
 
 		else if (!strcmp(entrada, "abrir") || !strcmp(entrada, "open")){
+
+			/* se já existir uma imagem aberta, sua alocação será liberada */
 			if (imagemAberta){
 				liberarAD(&imagem, imagem.pixels);
 			}
 
+			/* leitura do caminho do arquivo */
 			if (!temArquivo){
-				getc(stdin); // pegando o espaçom
+				getc(stdin); // pegando o espaço entre o comando e o nome do arquivo
 				fgets(imagem.caminho, 100, stdin);
 			}
 			else {
@@ -82,10 +87,13 @@ int main(){
 		}
 
 		else if (!strcmp(entrada, "sair") || !strcmp(entrada, "quit")){
+
+			/* limpa alocação dinâmica */
 			if (imagemAberta){
 				liberarAD(&imagem, imagem.pixels);
 			}
 
+			/* fecha o arquivo de especificação */
 			if (temArquivo){
 				fclose(arqEspecificacao);
 				printf("\n"); // quebra de linha final
@@ -95,14 +103,17 @@ int main(){
 		}
 
 		else if (!strcmp(entrada, "salvar") || !strcmp(entrada, "save")){
+
+			/* caso não exista uma imagem para ser salva */
 			if (!imagemAberta){
 				printf("Erro: imagem nao aberta\n");
 				limparBuffer();
 				continue;
 			}
 
+			/* leitura do nome do arquivo */
 			if (!temArquivo){
-				getc(stdin); // pegando o espaço
+				getc(stdin); // pegando o espaço entre o comando e o nome do arquivo
 				fgets(imagem.nomeDoArquivo, 50, stdin);
 				imagem.nomeDoArquivo[strlen(imagem.nomeDoArquivo) - 1] = '\0';
 			}
@@ -117,7 +128,11 @@ int main(){
 		}
 
 		else if (!strcmp(entrada, "ler") || !strcmp(entrada, "read")){
-			scanf("%s", imagem.caminho);
+			
+			/* leitura do caminho do arquivo de especificação */
+			getc(stdin); // pegando o espaço entre o comando e o nome do arquivo
+			fgets(imagem.caminho, 100, stdin);
+			imagem.caminho[ strlen(imagem.caminho) - 1 ] = '\0'; // removendo o '\n' do final da string
 
 			arqEspecificacao = lerArquivo(&temArquivo, imagem);
 

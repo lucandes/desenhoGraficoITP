@@ -3,7 +3,7 @@
 
 #include "struct.h"
 
-Linha criarLinha(Ponto p1, Ponto p2, Cor cor);
+Linha criarLinha(Ponto pontos[2], Cor cor);
 void inserirLinha(Linha linha, Imagem *imagem);
 
 #endif

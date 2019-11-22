@@ -3,6 +3,7 @@
 #include "func.h"
 #include "linha.h"
 #include "poligono.h"
+#include "circulo.h"
 
 /****************************************************
 Função: criarImagem
@@ -129,14 +130,20 @@ void salvarImagem(Imagem *imagem){
 	fprintf(imagem->arquivo, "%d\n", imagem->max);
 
 	/* escrevendo matriz de pixels no arquivo */
-	for (int x = 0; x < imagem->alt; x++){
-		for (int y = 0; y < imagem->lar; y++){
-			fprintf(imagem->arquivo, "%d %d %d\n",
-				imagem->pixels[x][y].r,
-				imagem->pixels[x][y].g,
-				imagem->pixels[x][y].b);
+	for (int y = 0; y < imagem->alt; y++){
+		for (int x = 0; x < imagem->lar; x++){
+			fprintf(imagem->arquivo, "%d ", imagem->pixels[y][x].r);
+			fprintf(imagem->arquivo, "%d ", imagem->pixels[y][x].g);
+			fprintf(imagem->arquivo, "%d ", imagem->pixels[y][x].b);
+			fprintf(imagem->arquivo, "\n");
+			/*fprintf(imagem->arquivo, "%d %d %d\n",
+				imagem->pixels[y][x].r,
+				imagem->pixels[y][x].g,
+				imagem->pixels[y][x].b);*/
 		}
 	}
+
+	fclose(imagem->arquivo);
 }
 
 /****************************************************
@@ -176,6 +183,7 @@ Desenho criarDesenho(void){
 
 	d.numLinhas = 0;
 	d.numPoligonos = 0;
+	d.numCirculos = 0;
 
 	return d;
 };
@@ -228,5 +236,10 @@ void inserirDesenhos(Imagem *imagem){
 	/* inserindo poligonos */
 	for (int i = 0; i < imagem->desenho.numPoligonos; ++i){
 		inserirPoligono(imagem->desenho.poligonos[i], imagem);
+	}
+
+	/* inserindo circulos */
+	for (int i = 0; i < imagem->desenho.numCirculos; ++i){
+		inserirCirculo(imagem->desenho.circulos[i], imagem);
 	}
 }

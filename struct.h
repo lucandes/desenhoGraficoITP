@@ -39,11 +39,25 @@ typedef struct linha {
 	Cor cor;
 }Linha;
 
+/*********************
+Estrutura: Poligono
+Descrição: armazena informações sobre polígonos na imagem
+*********************/
 typedef struct poligono{
 	int numFaces;
 	Ponto pontos[100];
 	Linha linhas[100];
 }Poligono;
+
+/*********************
+Estrutura: Circulo
+Descrição: armazena informações sobre círculos na imagem
+*********************/
+typedef struct circulo{
+	Ponto centro;
+	int raio;
+	Cor cor;
+}Circulo;
 
 /*********************
 Estrutura: Desenho
@@ -56,6 +70,9 @@ typedef struct desenho {
 
 	Poligono poligonos[100];
 	int numPoligonos;
+
+	Circulo circulos[100];
+	int numCirculos;
 }Desenho;
 
 /*********************

@@ -5,6 +5,7 @@
 #include "imagem.h"
 #include "linha.h"
 #include "poligono.h"
+#include "circulo.h"
 #include "safestdlib.h"
 #include "func.h"
 
@@ -181,6 +182,7 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo
 		printf("---------------------------------------\n");
 		printf("ajuda                         (imprime a lista de comandos)\n");
 		printf("imagem <lar> <alt>            (gera uma nova imagem)\n");
+		
 		printf("cor <r> <g> <b>               (altera a cor atual do pincel)\n");
 		printf("linha <x1> <y1> <x2> <y2>     (gera uma nova linha)\n");
 		printf("poligono <N> <p1> ... <pN>    (gera um novo poligono)\n");
@@ -314,6 +316,22 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo
 		int n = imagem->desenho.numPoligonos;
 		imagem->desenho.poligonos[n] = pol;
 		imagem->desenho.numPoligonos += 1;
+	}
+
+	/* comando circulo */
+	else if (!strcmp(entrada, "circulo") || !strcmp(entrada, "circle")){
+		if (!imagemAberta){
+			printf("Erro: imagem nao aberta\n");
+			limparBuffer();
+			return;
+		}
+
+		int raio;
+		Ponto centro;
+
+		scanf(" %d %d %d", &raio, &centro.x, &centro.y);
+
+		criarCirculo(centro, raio, imagem->cor);
 	}
 
 	/* comando cor */

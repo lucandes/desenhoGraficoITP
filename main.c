@@ -55,6 +55,7 @@ int main(){
 			}
 
 			imagem = criarImagem(&imagemAberta, imagem.lar, imagem.alt);
+			printf("imagemAberta: %d\n", imagemAberta);
 		}
 
 		else if (!strcmp(entrada, "abrir") || !strcmp(entrada, "open")){

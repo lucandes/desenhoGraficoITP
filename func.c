@@ -169,6 +169,14 @@ int lerDoArquivo(FILE *arquivo, char *entrada){
 	return 0;
 }
 
+/****************************************************
+Função: checaImagem
+Parâmetros: inteiro imagemAberta, inteiro temArquivo, arquivo tipo FILE
+Retorno: inteiro
+
+Descrição: verifica se há uma imagem aberta, se não houver, limpa o
+buffer e retorna 0. Se existir uma imagem aberta, será retornado 1.
+*****************************************************/
 int checaImagem(int imagemAberta, int temArquivo, FILE *arq){
 	if (!imagemAberta){
 			printf("Erro: imagem nao aberta\n");
@@ -179,6 +187,13 @@ int checaImagem(int imagemAberta, int temArquivo, FILE *arq){
 	return 1;
 }
 
+/****************************************************
+Função: lerInteiros
+Parâmetros: ponteiro de inteiro, numero de inteiros a serem lidos, inteiro temArquivo, arquivo tipo FILE
+Retorno: nenhum
+
+Descrição: 
+*****************************************************/
 void lerInteiros(int *inteiros, int numInteiros, int temArquivo, FILE *arq){
 	for (int i = 0; i < numInteiros; ++i){
 		if (!temArquivo)

@@ -1,6 +1,13 @@
 #include "circulo.h"
 #include "func.h"
 
+/****************************************************
+Função: criarCirculo
+Parâmetros: ponto central do círculo, inteiro raio, cor
+Retorno: tipo Circulo
+
+Descrição: gera um círculo a partir dos parâmetros recebidos e o retorna
+*****************************************************/
 Circulo criarCirculo(Ponto centro, int raio, Cor cor){
 	Circulo c;
 	c.centro = centro;
@@ -10,32 +17,47 @@ Circulo criarCirculo(Ponto centro, int raio, Cor cor){
 	return c;
 }
 
-void plot_point(Circulo c, int x, int y, Imagem *imagem, Cor cor){
-	int xc = c.centro.x;
-	int yc = c.centro.y;
+/****************************************************
+Função: inserirPonto
+Parâmetros: tipo Circulo, inteiro x, inteiro y, ponteiro tipo Imagem, tipo Cor
+Retorno: nenhum
 
-	pintarPixel(xc+x, yc+y, imagem, cor);
-	pintarPixel(xc+x, yc-y, imagem, cor);
-	pintarPixel(xc+y, yc+x, imagem, cor);
-	pintarPixel(xc+y, yc-x, imagem, cor);
-	pintarPixel(xc-x, yc-y, imagem, cor);
-	pintarPixel(xc-y, yc-x, imagem, cor);
-	pintarPixel(xc-x, yc+y, imagem, cor);
-	pintarPixel(xc-y, yc+x, imagem, cor);
+Descrição: insere um pixel em cada octeto do círculo utilizando o raio 
+do círculo e as coordenadas do ponto.
+*****************************************************/
+void inserirOcteto(Circulo circ, int x, int y, Imagem *imagem, Cor cor){
+	int xc = circ.centro.x;
+	int yc = circ.centro.y;
+
+	/* em cada octeto do círculo será pintado um píxel */
+	pintarPixel(xc + x, yc + y, imagem, cor);
+	pintarPixel(xc + x, yc - y, imagem, cor);
+	pintarPixel(xc + y, yc + x, imagem, cor);
+	pintarPixel(xc + y, yc - x, imagem, cor);
+	pintarPixel(xc - x, yc - y, imagem, cor);
+	pintarPixel(xc - y, yc - x, imagem, cor);
+	pintarPixel(xc - x, yc + y, imagem, cor);
+	pintarPixel(xc - y, yc + x, imagem, cor);
 }
 
-void inserirCirculo(Circulo c, Imagem *imagem){
+/****************************************************
+Função: inserirCirculo
+Parâmetros: tipo Circulo, ponteiro tipo Imagem
+Retorno: nenhum
+
+Descrição: insere um circulo na matriz de pixels da imagem
+*****************************************************/
+void inserirCirculo(Circulo circ, Imagem *imagem){
 	int x = 0;
-	int y = c.raio;
+	int y = circ.raio;
   	float pk = (5.0/4.0) - y;
 
-	/* Plot the points */
-	/* Plot the first point */
-	plot_point(c, x, y, imagem, c.cor);
+  	/* insere o ponto inicial em cada octeto */
+	inserirOcteto(circ, x, y, imagem, c.cor);
 
-	/* Find all vertices till x = y */
+	/* enquanto x for menor que y */
 	while(x < y) {
-		x = x + 1;
+		x++;
 
 		if(pk < 0)
 		  pk = pk + 2 * x + 1;
@@ -45,7 +67,6 @@ void inserirCirculo(Circulo c, Imagem *imagem){
 		  pk = pk + 2*(x - y) + 1;
 		}
 
-	plot_point(c, x, y, imagem, c.cor);
-
+	inserirOcteto(circ, x, y, imagem, c.cor);
 	}
 }

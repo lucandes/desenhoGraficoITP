@@ -10,5 +10,6 @@ void limparImagem(Imagem *imagem, Cor cor);
 Desenho criarDesenho(void);
 void listarDesenhos(Desenho d);
 void inserirDesenhos(Imagem *imagem);
+void inserirPreenchimento(int x, int y, Preencher p, Imagem *imagem);
 
 #endif

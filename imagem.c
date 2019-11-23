@@ -25,9 +25,9 @@ Imagem criarImagem(int *imagemAberta, int lar, int alt){
 	imagem.numDePixels = imagem.lar * imagem.alt;
 
 	/* alocação dinâmica da matriz pixels */
-	imagem.pixels = (Pixel **) safeMalloc(imagem.alt * sizeof(Pixel *));
+	imagem.pixels = (Cor **) safeMalloc(imagem.alt * sizeof(Cor *));
 	for (int i = 0; i < imagem.alt; i++){
-		imagem.pixels[i] = (Pixel *) safeCalloc(imagem.lar, sizeof(Pixel));
+		imagem.pixels[i] = (Cor *) safeCalloc(imagem.lar, sizeof(Cor));
 
 		/* a imagem será criada com a cor branca */
 		for (int j = 0; j < imagem.lar; j++){
@@ -74,9 +74,9 @@ Imagem abrirImagem(int *imagemAberta, char caminho[100]){
 	fscanf(imagem.arquivo, "%d", &imagem.max);
 
 	/* alocação dinâmica da matriz pixels */
-	imagem.pixels = (Pixel **) safeMalloc(imagem.alt * sizeof(Pixel *));
+	imagem.pixels = (Cor **) safeMalloc(imagem.alt * sizeof(Cor *));
 	for (int i = 0; i < imagem.alt; i++){
-		imagem.pixels[i] = (Pixel *) safeCalloc(imagem.lar, sizeof(Pixel));
+		imagem.pixels[i] = (Cor *) safeCalloc(imagem.lar, sizeof(Cor));
 	}
 
 	/* lendo pixels da imagem e atribuindo à matriz */
@@ -171,6 +171,31 @@ void limparImagem(Imagem *imagem, Cor cor){
 	imagem->desenho = criarDesenho();
 }
 
+void inserirPreenchimento(int x, int y, Preencher p, Imagem *imagem){
+	if (x > imagem->lar - 1 || x < 0 || y > imagem->alt - 1 || y < 0)
+		return;
+
+	Cor cor;
+	cor = imagem->pixels[y][x]; // cor do pixel atual
+
+	/* se a cor do pixel atual for diferente da cor do pixel pai (anterior) */
+	if (cor.r != p.cor.r || cor.g != p.cor.g || cor.b != p.cor.b)
+		return;
+
+	printf("preenchendo (%d, %d)\n", x, y);
+	
+	/* pintando pixel com nova cor */
+	imagem->pixels[y][x].r = p.novaCor.r;
+	imagem->pixels[y][x].g = p.novaCor.g;
+	imagem->pixels[y][x].b = p.novaCor.b;
+
+	/* chamada recursiva para os pixels vizinhos */
+	inserirPreenchimento(x+1, y, p, imagem);
+	inserirPreenchimento(x-1, y, p, imagem);
+	inserirPreenchimento(x, y+1, p, imagem);
+	inserirPreenchimento(x, y-1, p, imagem);
+}
+
 /****************************************************
 Função: criarDesenho
 Parâmetros: nenhum
@@ -184,6 +209,7 @@ Desenho criarDesenho(void){
 	d.numLinhas = 0;
 	d.numPoligonos = 0;
 	d.numCirculos = 0;
+	d.numPreencher = 0;
 
 	return d;
 };
@@ -250,5 +276,11 @@ void inserirDesenhos(Imagem *imagem){
 	/* inserindo circulos */
 	for (int i = 0; i < imagem->desenho.numCirculos; ++i){
 		inserirCirculo(imagem->desenho.circulos[i], imagem);
+	}
+
+	/* inserindo preenchimentos */
+	for (int i = 0; i < imagem->desenho.numCirculos; ++i){
+		Preencher p = imagem->desenho.preencher[i];
+		inserirPreenchimento(p.ponto.x, p.ponto.y, p, imagem);
 	}
 }

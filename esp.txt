@@ -1,35 +1,4 @@
-imagem 100 100
-clear 100 255 100
-color 255 255 255
-circle 30 0 0
-circle 50 0 0
-circle 70 0 0
-circle 90 0 0
-circle 110 0 0
-color 0 0 0
-circle 130 0 0
-color 255 255 255
-circle 30 99 0
-circle 50 99 0
-circle 70 99 0
-circle 90 99 0
-circle 110 99 0
-color 0 0 0
-circle 130 99 0
-color 255 255 255
-circle 30 99 99
-circle 50 99 99
-circle 70 99 99
-circle 90 99 99 
-circle 110 99 99
-color 0 0 0
-circle 130 99 99
-color 255 255 255
-circle 30 0 99
-circle 50 0 99
-circle 70 0 99
-circle 90 0 99
-circle 110 0 99
-color 0 0 0
-circle 130 0 99
+imagem 600 300
+circulo 100 0 0
+preencher 105 0 0 0 100
 salvar img.ppm

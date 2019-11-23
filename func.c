@@ -37,7 +37,7 @@ Cor criarCor(int temArquivo, FILE *arq){
 
 /****************************************************
 Função: pintarPixel
-Parâmetros: coordenadas do pixel, matriz tipo Pixel, cor tipo Cor
+Parâmetros: coordenadas do pixel, matriz tipo Cor, cor tipo Cor
 Retorno: nenhum
 
 Descrição: altera a cor do pixel na matriz
@@ -59,13 +59,13 @@ void pintarPixel(int x, int y, Imagem *imagem, Cor cor){
 
 /****************************************************
 Função: liberaAD
-Parâmetros: ponteiro de estrutura Imagem, matriz do tipo Pixel
+Parâmetros: ponteiro de estrutura Imagem, matriz do tipo Cor
 Retorno: nenhum
 
 Descrição: libera toda alocação dinâmica utilizada ao longo do
 programa, esta função será chamada quando o usuário desejar sair.
 *****************************************************/
-void liberarAD(Imagem *imagem, Pixel **pixels){
+void liberarAD(Imagem *imagem, Cor **pixels){
 	for (int i = 0; i < imagem->alt; ++i)
 		free(pixels[i]);
 	free(pixels);
@@ -248,10 +248,11 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo
 		printf("---------------------------------------\n");
 		printf("ajuda                         (imprime a lista de comandos)\n");
 		printf("imagem <lar> <alt>            (gera uma nova imagem)\n");
-		
 		printf("cor <r> <g> <b>               (altera a cor atual do pincel)\n");
 		printf("linha <x1> <y1> <x2> <y2>     (gera uma nova linha)\n");
 		printf("poligono <N> <p1> ... <pN>    (gera um novo poligono)\n");
+		printf("circulo <raio> <xc> <yc>      (gera um novo circulo)\n");
+		printf("preencher <x> <y> <r> <g> <b> (preenche a area determinada)\n");
 		printf("lista                         (lista os desenhos da imagem)\n");
 		printf("limpar <r> <g> <b>            (preenche toda a imagem)\n");
 		printf("salvar <nome_do_arquivo.ppm>  (salva em um arquivo ppm)\n");
@@ -348,6 +349,23 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo
 		/* inserindo circulo na estrutura de desenho */
 		int n = imagem->desenho.numCirculos++; // será acrescentado mais um em numCirculos após atribuir
 		imagem->desenho.circulos[n] = c;
+	}
+
+	/* comando preencher */
+	else if (!strcmp(entrada, "preencher") || !strcmp(entrada, "fill")){
+		/* verifica se existem uma imagem aberta */
+		if (!checaImagem(imagemAberta, temArquivo, arqEspecificacao))
+			return;
+
+		Preencher p;
+		lerPontos(&p.ponto, 1, temArquivo, arqEspecificacao);
+		p.novaCor = criarCor(temArquivo, arqEspecificacao);
+		p.cor = imagem->pixels[p.ponto.y][p.ponto.x];
+
+		/* inserindo preenchimento na estrutura de desenho */
+		int n = imagem->desenho.numPreencher++; // será acrescentado mais um em numPreencher após atribuir
+		imagem->desenho.preencher[n] = p;
+		printf("all done here\n");
 	}
 
 	/* comando cor */

@@ -9,7 +9,7 @@
 
 Cor criarCor(int temArquivo, FILE *arq);
 void pintarPixel(int x, int y, Imagem *imagem, Cor cor);
-void liberarAD(Imagem *imagem, Pixel **pixels);
+void liberarAD(Imagem *imagem, Cor **pixels);
 void limparBuffer(void);
 void limparFileBuffer(FILE *arq);
 void limpaConsole(void);

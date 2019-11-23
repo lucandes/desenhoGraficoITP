@@ -53,7 +53,7 @@ void inserirCirculo(Circulo circ, Imagem *imagem){
   	float pk = (5.0/4.0) - y;
 
   	/* insere o ponto inicial em cada octeto */
-	inserirOcteto(circ, x, y, imagem, c.cor);
+	inserirOcteto(circ, x, y, imagem, circ.cor);
 
 	/* enquanto x for menor que y */
 	while(x < y) {
@@ -67,6 +67,6 @@ void inserirCirculo(Circulo circ, Imagem *imagem){
 		  pk = pk + 2*(x - y) + 1;
 		}
 
-	inserirOcteto(circ, x, y, imagem, c.cor);
+	inserirOcteto(circ, x, y, imagem, circ.cor);
 	}
 }

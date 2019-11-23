@@ -6,14 +6,6 @@
 #include <string.h>
 
 /*********************
-Estrutura: Pixel
-Descrição: armazena as informações sobre o pixel
-*********************/
-typedef struct pixel {
-	int r,g,b;
-}Pixel;
-
-/*********************
 Estrutura: Cor
 Descrição: armazena cores no formato RGB
 *********************/
@@ -59,6 +51,12 @@ typedef struct circulo{
 	Cor cor;
 }Circulo;
 
+typedef struct preencher{
+	Ponto ponto;
+	Cor cor; // cor inicial
+	Cor novaCor; // cor a ser inserida
+}Preencher;
+
 /*********************
 Estrutura: Desenho
 Descrição: Todo desenho feito no programa será armazenado
@@ -73,6 +71,9 @@ typedef struct desenho {
 
 	Circulo circulos[100];
 	int numCirculos;
+
+	Preencher preencher[100];
+	int numPreencher;
 }Desenho;
 
 /*********************
@@ -89,7 +90,7 @@ typedef struct imagem {
 	int max;
 	int numDePixels;
 
-	Pixel **pixels;
+	Cor **pixels;
 	Cor cor;
 	Desenho desenho;
 }Imagem;

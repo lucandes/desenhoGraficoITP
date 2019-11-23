@@ -11,21 +11,27 @@ do polígono e retorna a estrutura.
 *****************************************************/
 Poligono criarPoligono(int numFaces, Ponto *pontos, Cor cor){
 	Poligono pol;
-	pol.numFaces = numFaces;
+	pol.numFaces = numFaces; 
+
+	Ponto p[2]; // vetor utilizado para gerar linhas
+	int i; // contador
+
+	/* atribuindo os pontos à estrutura do poligono */
 	for (int i = 0; i < numFaces; i++)
 		pol.pontos[i] = pontos[i];
-	
 
 	/* criando linhas do polígono */
-	for (int i = 1; i < numFaces; ++i){
-		pol.linhas[i-1] = (Linha) criarLinha(pontos[i-1], pontos[i], cor);
+	for (i = 1; i < numFaces; ++i){
+		p[0] = pontos[i - 1];
+		p[1] = pontos[i];
 
-		// se for a última chamada do loop
-		if (i == numFaces - 1){
-			// gere uma linha do ultimo ponto ao primeiro
-			pol.linhas[i] = (Linha) criarLinha(pontos[i], pontos[0], cor);
-		}
+		pol.linhas[i-1] = criarLinha(p, cor);
 	}
+
+	/* criando uma linha do ultimo ponto ao primeiro */
+	p[0] = pontos[numFaces - 1];
+	p[1] = pontos[0];
+	pol.linhas[i] = criarLinha(p, cor);
 
 	return pol;
 }

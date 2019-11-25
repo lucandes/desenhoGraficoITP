@@ -62,6 +62,7 @@ Imagem abrirImagem(int *imagemAberta, char caminho[100]){
 
 	Imagem imagem;
 	imagem.arquivo = fopen(caminho, "r");
+
 	if (imagem.arquivo == NULL){
 		*imagemAberta = 0;
 		return imagem;

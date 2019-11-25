@@ -48,6 +48,10 @@ int main(){
 			/* leitura das dimensões da imagem */
 			int dim[2];
 			lerInteiros(dim, 2, temArquivo, arqEspecificacao);
+			if (temArquivo){
+				getc(arqEspecificacao); // recebendo o \n
+				printf("\n");
+			}
 
 			imagem = criarImagem(&imagemAberta, dim[0], dim[1]);
 		}
@@ -68,8 +72,6 @@ int main(){
 				imagem.caminho[strlen(imagem.caminho) - 1] = '\0';
 				printf(" %s\n", imagem.caminho);
 			}
-
-			//printf("caminho lido '%s'\n", imagem.caminho);
 
 			imagem = abrirImagem(&imagemAberta, imagem.caminho);
 			
@@ -109,7 +111,8 @@ int main(){
 			}
 			else {
 				fgets(imagem.nomeDoArquivo, 50, arqEspecificacao);
-				imagem.nomeDoArquivo[strlen(imagem.nomeDoArquivo) - 1] = '\0';
+				if (imagem.nomeDoArquivo[strlen(imagem.nomeDoArquivo) - 1] == '\n')
+					imagem.nomeDoArquivo[strlen(imagem.nomeDoArquivo) - 1] = '\0';
 				printf(" %s\n", imagem.nomeDoArquivo);
 			}
 
@@ -134,7 +137,6 @@ int main(){
 		else {
 			executar(entrada, &imagem, imagemAberta, temArquivo, arqEspecificacao);
 		}
-
 	} while (!sair);
 
 	return 0;

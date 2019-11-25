@@ -19,6 +19,7 @@ int checaImagem(int imagemAberta, int temArquivo, FILE *arq);
 void lerInteiros(int *inteiros, int numInteiros, int temArquivo, FILE *arq);
 void lerPontos(Ponto *pontos, int numPontos, int temArquivo, FILE *arq);
 int verificaCoordenadas(int x, int y, Imagem *imagem);
+void gerarPontosRet(Ponto pontoInicial, Ponto pontos[4], int dim[2]);
 void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo, FILE *arqEspecificacao);
 
 #endif

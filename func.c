@@ -43,6 +43,7 @@ Retorno: nenhum
 Descrição: altera a cor do pixel na matriz
 *****************************************************/
 void pintarPixel(int x, int y, Imagem *imagem, Cor cor){
+
 	int maxX = imagem->lar - 1;
 	int maxY = imagem->alt - 1;
 
@@ -131,9 +132,8 @@ FILE *lerArquivo(int *temArquivo, Imagem imagem){
 
 	arquivo = fopen(imagem.caminho, "r");
 
-	if (!arquivo){
+	if (arquivo == NULL){
 		*temArquivo = 0;
-		fclose(arquivo);
 	}
 	else
 		*temArquivo = 1;
@@ -232,6 +232,30 @@ int verificaCoordenadas(int x, int y, Imagem *imagem){
 }
 
 /****************************************************
+Função: gerarPontosRet
+Parâmetros: ponto inicial do retângulo, vetor de pontos, dimensões do retângulo
+Retorno: nenhum
+
+Descrição: atribui os pontos do retângulo ao vetor de pontos com base
+no ponto inicial e dimensões informadas pelo usuário.
+*****************************************************/
+void gerarPontosRet(Ponto pontoInicial, Ponto pontos[4], int dim[2]){
+	int distX = dim[0];
+	int distY = dim[1];
+
+	pontos[0] = pontoInicial;
+
+	pontos[1] = pontos[0];
+	pontos[1].x += distX;
+
+	pontos[2] = pontos[1];
+	pontos[2].y += distY;
+
+	pontos[3] = pontos[0];
+	pontos[3].y += distY;
+}
+
+/****************************************************
 Função: executar
 Parâmetros: entrada do usuário, estrutura tipo Imagem
 Retorno: nenhum
@@ -251,6 +275,7 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo
 		printf("cor <r> <g> <b>               (altera a cor atual do pincel)\n");
 		printf("linha <x1> <y1> <x2> <y2>     (gera uma nova linha)\n");
 		printf("poligono <N> <p1> ... <pN>    (gera um novo poligono)\n");
+		printf("retangulo <x> <y> <lar> <alt> (gera um novo retangulo)\n");
 		printf("circulo <raio> <xc> <yc>      (gera um novo circulo)\n");
 		printf("preencher <x> <y> <r> <g> <b> (preenche a area determinada)\n");
 		printf("lista                         (lista os desenhos da imagem)\n");
@@ -282,6 +307,9 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo
 
 		/* leitura de entrada */
 		lerPontos(pontos, 2, temArquivo, arqEspecificacao);
+		if (temArquivo){
+			limparFileBuffer(arqEspecificacao);
+		}
 
 		/* verifica se as entradas são válidas */
 		for (int i = 0; i < 2; ++i){
@@ -297,6 +325,38 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo
 		imagem->desenho.numLinhas += 1;
 	}
 
+	/* comando retangulo */
+	else if (!strcmp(entrada, "retangulo") || !strcmp(entrada, "rect")){
+		/* verifica se existem uma imagem aberta */
+		if (!checaImagem(imagemAberta, temArquivo, arqEspecificacao))
+			return;
+
+		int numFaces = 4;
+
+		/* leitura do ponto inicial */
+		Ponto pontoInicial;
+		lerPontos(&pontoInicial, 1, temArquivo, arqEspecificacao);
+
+		/* leitura das dimensões do retângulo */
+		int dim[2];
+		lerInteiros(dim, 2, temArquivo, arqEspecificacao);
+		if (temArquivo){
+			limparFileBuffer(arqEspecificacao);
+			printf("\n");
+		}
+
+		/* definindo coordenadas dos pontos a partir das dimensões */
+		Ponto pontos[4];
+		gerarPontosRet(pontoInicial, pontos, dim);
+		
+		Poligono pol;
+		pol = criarPoligono(numFaces, pontos, imagem->cor);
+
+		/* adicionando poligono à estrutura de desenhos */
+		int n = imagem->desenho.numPoligonos++;
+		imagem->desenho.poligonos[n] = pol;
+	}
+
 	/* comando poligono */
 	else if (!strcmp(entrada, "poligono") || !strcmp(entrada, "polygon")){
 		/* verifica se existem uma imagem aberta */
@@ -306,6 +366,7 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo
 		/* leitura de numero de faces do polígono */
 		int numFaces; 
 		lerInteiros(&numFaces, 1, temArquivo, arqEspecificacao);
+
 
 		/* verificando se o número de faces é válido */
 		if (numFaces < 3 || numFaces > 100){
@@ -322,9 +383,8 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo
 		pol = criarPoligono(numFaces, pontos, imagem->cor);
 
 		/* adicionando poligono à estrutura de desenhos */
-		int n = imagem->desenho.numPoligonos;
+		int n = imagem->desenho.numPoligonos++;
 		imagem->desenho.poligonos[n] = pol;
-		imagem->desenho.numPoligonos += 1;
 	}
 
 	/* comando circulo */

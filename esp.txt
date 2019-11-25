@@ -1,4 +1,5 @@
 imagem 200 300
+limpar 100 200 110
 circulo 100 0 0
-preencher 105 0 0 0 100
-salvar img.ppm
+rect 36 23 112 206
+salvar esp.ppm

@@ -41,43 +41,35 @@ int main(){
 
 		/* aqui são checados apenas os comandos principais */
 		if (!strcmp(entrada, "imagem") || !strcmp(entrada, "image")){
-			
 			/* se já existir uma imagem aberta, sua alocação será liberada */
-			if (imagemAberta){
+			if (imagemAberta)
 				liberarAD(&imagem, imagem.pixels);
-			}
 
 			/* leitura das dimensões da imagem */
-			if (!temArquivo){
-				scanf(" %d", &imagem.lar);
-				scanf(" %d", &imagem.alt);
-			}
-			else {
-				fscanf(arqEspecificacao, " %d %d\n", &imagem.lar, &imagem.alt);
-				printf(" %d %d\n", imagem.lar, imagem.alt);
-			}
+			int dim[2];
+			lerInteiros(dim, 2, temArquivo, arqEspecificacao);
 
-			imagem = criarImagem(&imagemAberta, imagem.lar, imagem.alt);
-			printf("imagemAberta: %d\n", imagemAberta);
+			imagem = criarImagem(&imagemAberta, dim[0], dim[1]);
 		}
 
 		else if (!strcmp(entrada, "abrir") || !strcmp(entrada, "open")){
-
 			/* se já existir uma imagem aberta, sua alocação será liberada */
-			if (imagemAberta){
+			if (imagemAberta)
 				liberarAD(&imagem, imagem.pixels);
-			}
 
 			/* leitura do caminho do arquivo */
 			if (!temArquivo){
 				getc(stdin); // pegando o espaço entre o comando e o nome do arquivo
 				fgets(imagem.caminho, 100, stdin);
+				imagem.caminho[strlen(imagem.caminho) - 1] = '\0';
 			}
 			else {
 				fgets(imagem.caminho, 100, arqEspecificacao);
 				imagem.caminho[strlen(imagem.caminho) - 1] = '\0';
 				printf(" %s\n", imagem.caminho);
 			}
+
+			//printf("caminho lido '%s'\n", imagem.caminho);
 
 			imagem = abrirImagem(&imagemAberta, imagem.caminho);
 			
@@ -88,11 +80,9 @@ int main(){
 		}
 
 		else if (!strcmp(entrada, "sair") || !strcmp(entrada, "quit")){
-
 			/* limpa alocação dinâmica */
-			if (imagemAberta){
+			if (imagemAberta)
 				liberarAD(&imagem, imagem.pixels);
-			}
 
 			/* fecha o arquivo de especificação */
 			if (temArquivo){
@@ -104,7 +94,6 @@ int main(){
 		}
 
 		else if (!strcmp(entrada, "salvar") || !strcmp(entrada, "save")){
-
 			/* caso não exista uma imagem para ser salva */
 			if (!imagemAberta){
 				printf("Erro: imagem nao aberta\n");
@@ -129,7 +118,6 @@ int main(){
 		}
 
 		else if (!strcmp(entrada, "ler") || !strcmp(entrada, "read")){
-			
 			/* leitura do caminho do arquivo de especificação */
 			getc(stdin); // pegando o espaço entre o comando e o nome do arquivo
 			fgets(imagem.caminho, 100, stdin);

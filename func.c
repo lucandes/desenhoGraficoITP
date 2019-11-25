@@ -358,14 +358,16 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo
 			return;
 
 		Preencher p;
+		/* leitura de entradas do usuário */
 		lerPontos(&p.ponto, 1, temArquivo, arqEspecificacao);
 		p.novaCor = criarCor(temArquivo, arqEspecificacao);
+
+		/* atribuindo cor do pixel selecionado à estrutura */
 		p.cor = imagem->pixels[p.ponto.y][p.ponto.x];
 
 		/* inserindo preenchimento na estrutura de desenho */
 		int n = imagem->desenho.numPreencher++; // será acrescentado mais um em numPreencher após atribuir
 		imagem->desenho.preencher[n] = p;
-		printf("all done here\n");
 	}
 
 	/* comando cor */

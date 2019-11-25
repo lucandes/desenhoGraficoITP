@@ -45,6 +45,6 @@ Descrição: insere na imagem todos os polígonos criados
 *****************************************************/
 void inserirPoligono(Poligono pol, Imagem *imagem){
 	/* inserindo todas as linhas do polígono na imagem */
-	for (int i = 0; i < pol.numFaces; ++i)
+	for (int i = 0; i < pol.numFaces + 1; ++i)
 		inserirLinha(pol.linhas[i], imagem);
 }

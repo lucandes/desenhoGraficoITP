@@ -51,6 +51,10 @@ typedef struct circulo{
 	Cor cor;
 }Circulo;
 
+/*********************
+Estrutura: Circulo
+Descrição: armazena informações sobre preenchimentos na imagem
+*********************/
 typedef struct preencher{
 	Ponto ponto;
 	Cor cor; // cor inicial

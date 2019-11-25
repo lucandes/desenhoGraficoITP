@@ -171,23 +171,31 @@ void limparImagem(Imagem *imagem, Cor cor){
 	imagem->desenho = criarDesenho();
 }
 
+/****************************************************
+Função: inserirPreenchimento
+Parâmetros: coordenadas do pixel, estrutura Preencher, ponteiro tipo Imagem
+Retorno: nenhum
+
+Descrição: altera os pixels de uma área de mesma cor. Funciona de maneira
+recursiva, verificando os pixels em 4 sentidos opostos a partir do pixel
+inicial. (ERRO DE SEGMENTAÇÃO EM ÁREAS EXTENSAS)
+*****************************************************/
 void inserirPreenchimento(int x, int y, Preencher p, Imagem *imagem){
+	/* se o pixel estiver fora das dimensões da imagem */
 	if (x > imagem->lar - 1 || x < 0 || y > imagem->alt - 1 || y < 0)
 		return;
 
-	Cor cor;
-	cor = imagem->pixels[y][x]; // cor do pixel atual
+	Cor corAtual;
+	corAtual = imagem->pixels[y][x]; // cor do pixel atual
 
 	/* se a cor do pixel atual for diferente da cor do pixel pai (anterior) */
-	if (cor.r != p.cor.r || cor.g != p.cor.g || cor.b != p.cor.b)
+	if (corAtual.r != p.cor.r || corAtual.g != p.cor.g || corAtual.b != p.cor.b)
 		return;
 
-	printf("preenchendo (%d, %d)\n", x, y);
+	//printf("preenchendo (%d,%d)\n", x, y);
 	
 	/* pintando pixel com nova cor */
-	imagem->pixels[y][x].r = p.novaCor.r;
-	imagem->pixels[y][x].g = p.novaCor.g;
-	imagem->pixels[y][x].b = p.novaCor.b;
+	imagem->pixels[y][x] = p.novaCor;
 
 	/* chamada recursiva para os pixels vizinhos */
 	inserirPreenchimento(x+1, y, p, imagem);
@@ -222,14 +230,17 @@ Retorno: nenhum
 Descrição: imprime na tela todos os desenhos feitos na imagem
 *****************************************************/
 void listarDesenhos(Desenho d){
+	int count = 0;
 	/* listar linhas */
-	for (int i = 0; i < d.numLinhas; ++i)
+	for (int i = 0; i < d.numLinhas; ++i){
 		printf("linha %02d - p1 (%d,%d), p2 (%d,%d)\n", 
 			i+1, 
 			d.linhas[i].inicio.x,
 			d.linhas[i].inicio.y,
 			d.linhas[i].fim.x,
 			d.linhas[i].fim.y);
+		count++;
+	}
 
 	/* listar poligonos */
 	for (int i = 0; i < d.numPoligonos; ++i){
@@ -242,6 +253,7 @@ void listarDesenhos(Desenho d){
 				d.poligonos[i].pontos[j].y);
 		}
 		printf("\n");
+		count++;
 	}
 
 	/* listar circulos */
@@ -251,7 +263,11 @@ void listarDesenhos(Desenho d){
 			d.circulos[i].raio,
 			d.circulos[i].centro.x,
 			d.circulos[i].centro.y);
+		count++;
 	}
+
+	if (!count)
+		printf("A imagem atual nao possui desenhos\n");
 }
 
 /****************************************************
@@ -279,7 +295,7 @@ void inserirDesenhos(Imagem *imagem){
 	}
 
 	/* inserindo preenchimentos */
-	for (int i = 0; i < imagem->desenho.numCirculos; ++i){
+	for (int i = 0; i < imagem->desenho.numPreencher; ++i){
 		Preencher p = imagem->desenho.preencher[i];
 		inserirPreenchimento(p.ponto.x, p.ponto.y, p, imagem);
 	}

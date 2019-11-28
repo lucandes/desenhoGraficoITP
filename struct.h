@@ -78,6 +78,9 @@ typedef struct desenho {
 
 	Preencher preencher[100];
 	int numPreencher;
+
+	int ordem[100]; // define a ordem que os desenhos deverão ser escritos
+	int numOrdem;
 }Desenho;
 
 /*********************

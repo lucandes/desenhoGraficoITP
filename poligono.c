@@ -34,6 +34,10 @@ void criarPoligono(int numFaces, Ponto *pontos, Imagem *imagem){
 
 	int n = imagem->desenho.numPoligonos++;
 	imagem->desenho.poligonos[n] = pol;
+
+	/* adicionando o poligono à ordem */
+	int m = imagem->desenho.numOrdem++;
+	imagem->desenho.ordem[m] = 2; // 2 representa poligonos
 }
 
 /****************************************************

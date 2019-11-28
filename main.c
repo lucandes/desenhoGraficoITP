@@ -24,9 +24,13 @@ int main(){
 			eof = lerArquivo(arqEspecificacao, entrada);
 
 			/* se o arquivo chegou ao fim */
-			if (eof){
+			if (eof == 1){
 				printf("Arquivo lido com sucesso!\n\n");
 				temArquivo = 0;
+				continue;
+			}
+			/* se encontrou um comentário */
+			else if (eof == -1){
 				continue;
 			}
 

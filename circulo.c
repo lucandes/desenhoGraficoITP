@@ -16,6 +16,10 @@ Circulo criarCirculo(Ponto centro, int raio, Cor cor, Imagem *imagem){
 	/* adicionando aos desenhos da imagem */
 	int n = imagem->desenho.numCirculos++;
 	imagem->desenho.circulos[n] = c;
+
+	/* adicionando o circulo a ordem */
+	int i = imagem->desenho.numOrdem++;
+	imagem->desenho.ordem[i] = 3; // 3 representa círculos
 }
 
 /****************************************************

@@ -41,6 +41,10 @@ void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo
 		/* adicionando linha à estrutura linha */
 		int n = imagem->desenho.numLinhas++;
 		imagem->desenho.linhas[n] = l;
+
+		/* adicionando a linha à ordem */
+		int i = imagem->desenho.numOrdem++;
+		imagem->desenho.ordem[i] = 1; // 1 representa linhas
 	}
 
 	/* comando retangulo */
@@ -242,7 +246,7 @@ Retorno: int eof
 
 Descrição: lê o arquivo até encontrar um espaço, quebra de linha ou EOF 
 (fim do arquivo) e armazena no vetor "entrada". Retorna 1 se o arquivo 
-acabou e 0 se ainda possui conteúdo.
+acabou, 0 se ainda possui conteúdo e -1 se for um comentário (#).
 *****************************************************/
 int lerArquivo(FILE *arquivo, char *entrada){
 	char c = 'a'; // iniciado com char genérico para satisfazer a condição do loop
@@ -252,6 +256,10 @@ int lerArquivo(FILE *arquivo, char *entrada){
 	for(int i = 0; c != ' ' && c != '\n'; i++){
 		c = getc(arquivo);
 
+		if (c == '#'){
+			while (getc(arquivo) != '\n');
+			return -1;
+		}
 		/* se o char for letra será inserido na string, se for 
 		   espaço ou quebra de linha o '\0' é inserido */
 		c == ' ' || c == '\n' ? (entrada[i] = '\0') : (entrada[i] = c);

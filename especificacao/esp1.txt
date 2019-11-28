@@ -1,0 +1,15 @@
+image 300 300
+clear 220 20 0
+circle 150 150 30
+fill 150 150 0 0 255
+color 0 200 0
+line 100 200 200 100
+line 100 100 200 200
+color 0 0 200
+rect 30 30 60 40
+fill 31 31 0 0 0
+fill 151 152 0 0 0
+color 0 255 0
+line 0 100 100 0
+fill 0 0 0 0 0
+save espp.ppm

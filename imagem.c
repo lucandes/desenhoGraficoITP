@@ -30,6 +30,14 @@ Imagem criarImagem(int *imagemAberta, int lar, int alt){
 			exit(1);
 	}
 
+	/* pintando a imagem de branco */
+	for (int y = 0; y < imagem.alt; y++)
+		for (int x = 0; x < imagem.lar; x++){
+			imagem.pixels[y][x].r = 255;
+			imagem.pixels[y][x].g = 255;
+			imagem.pixels[y][x].b = 255; 
+		}
+
 	/* atribuindo a cor preta ao pincel */
 	imagem.cor.r = 0;
 	imagem.cor.g = 0;
@@ -198,12 +206,13 @@ void criarPreenchimento(Ponto p, Cor novaCor, Imagem *imagem){
 	fill.ponto.x = p.x;
 	fill.ponto.y = p.y;
 
-	/* atribuindo cor do pixel selecionado */
-	fill.cor = imagem->pixels[p.y][p.x];
-
 	/* inserindo preenchimento na estrutura de desenho */
 	int n = imagem->desenho.numPreencher++;
 	imagem->desenho.preencher[n] = fill;
+
+	/* adicionando o preenchimento à ordem */
+	int i = imagem->desenho.numOrdem++;
+	imagem->desenho.ordem[i] = 4; // 4 representa preencher
 }
 
 /****************************************************
@@ -253,6 +262,7 @@ Desenho criarDesenho(void){
 	d.numPoligonos = 0;
 	d.numCirculos = 0;
 	d.numPreencher = 0;
+	d.numOrdem = 0;
 
 	return d;
 };
@@ -317,24 +327,32 @@ Descrição: aplica todos os desenhos na matriz de pixel, essa função é
 chamada apenas na etapa de salvamento do arquivo ppm
 *****************************************************/
 void inserirDesenhos(Imagem *imagem){
-	/* inserindo poligonos */
-	for (int i = 0; i < imagem->desenho.numPoligonos; ++i){
-		inserirPoligono(imagem->desenho.poligonos[i], imagem);
-	}
-	
-	/* inserindo linhas */
-	for (int i = 0; i < imagem->desenho.numLinhas; ++i){
-		inserirLinha(imagem->desenho.linhas[i], imagem);
-	}
+	int numDesenhos = imagem->desenho.numOrdem;
 
-	/* inserindo circulos */
-	for (int i = 0; i < imagem->desenho.numCirculos; ++i){
-		inserirCirculo(imagem->desenho.circulos[i], imagem);
-	}
+	int lin = 0;
+	int cir = 0;
+	int pol = 0;
+	int pre = 0;
 
-	/* inserindo preenchimentos */
-	for (int i = 0; i < imagem->desenho.numPreencher; ++i){
-		Preencher p = imagem->desenho.preencher[i];
-		inserirPreenchimento(p.ponto.x, p.ponto.y, p, imagem);
+	for (int i = 0; i < numDesenhos; ++i){
+		int d = imagem->desenho.ordem[i];
+
+		if (d == 1){
+			inserirLinha(imagem->desenho.linhas[lin++], imagem);
+		}
+
+		else if (d == 2){
+			inserirPoligono(imagem->desenho.poligonos[cir++], imagem);
+		}
+
+		else if (d == 3){
+			inserirCirculo(imagem->desenho.circulos[pol++], imagem);
+		}
+
+		else if (d == 4){
+			Preencher p = imagem->desenho.preencher[pre++];
+			p.cor = imagem->pixels[p.ponto.y][p.ponto.x]; // definindo cor do pixel inicial
+			inserirPreenchimento(p.ponto.x, p.ponto.y, p, imagem);
+		}
 	}
 }

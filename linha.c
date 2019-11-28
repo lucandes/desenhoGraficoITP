@@ -1,5 +1,4 @@
 #include "linha.h"
-#include "func.h"
 
 /****************************************************
 Função: criarLinha
@@ -9,7 +8,7 @@ Retorno: nenhum
 Descrição: recebe os pontos do usuário e caso sejam válidos, 
 cria uma linha e armazena na estrutura de desenhos da imagem
 *****************************************************/
-Linha criarLinha(Ponto pontos[2], Cor cor){
+Linha criarLinha(Ponto pontos[2], Cor cor, Imagem *imagem){
 	Linha linha;
 
 	/* leitura das coordenadas */

@@ -1,9 +1,4 @@
 #include "imagem.h"
-#include "struct.h"
-#include "func.h"
-#include "linha.h"
-#include "poligono.h"
-#include "circulo.h"
 
 /****************************************************
 Função: criarImagem
@@ -25,16 +20,14 @@ Imagem criarImagem(int *imagemAberta, int lar, int alt){
 	imagem.numDePixels = imagem.lar * imagem.alt;
 
 	/* alocação dinâmica da matriz pixels */
-	imagem.pixels = (Cor **) safeMalloc(imagem.alt * sizeof(Cor *));
-	for (int i = 0; i < imagem.alt; i++){
-		imagem.pixels[i] = (Cor *) safeCalloc(imagem.lar, sizeof(Cor));
+	imagem.pixels = (Cor **) malloc(imagem.alt * sizeof(Cor *));
+	if (!imagem.pixels)
+		exit(1);
 
-		/* a imagem será criada com a cor branca */
-		for (int j = 0; j < imagem.lar; j++){
-			imagem.pixels[i][j].r = 255;
-			imagem.pixels[i][j].g = 255;
-			imagem.pixels[i][j].b = 255;
-		}
+	for (int i = 0; i < imagem.alt; i++){
+		imagem.pixels[i] = (Cor *) calloc(imagem.lar, sizeof(Cor));
+		if (!imagem.pixels[i])
+			exit(1);
 	}
 
 	/* atribuindo a cor preta ao pincel */
@@ -75,9 +68,14 @@ Imagem abrirImagem(int *imagemAberta, char caminho[100]){
 	fscanf(imagem.arquivo, "%d", &imagem.max);
 
 	/* alocação dinâmica da matriz pixels */
-	imagem.pixels = (Cor **) safeMalloc(imagem.alt * sizeof(Cor *));
+	imagem.pixels = (Cor **) malloc(imagem.alt * sizeof(Cor *));
+	if (!imagem.pixels)
+		exit(1);
+
 	for (int i = 0; i < imagem.alt; i++){
-		imagem.pixels[i] = (Cor *) safeCalloc(imagem.lar, sizeof(Cor));
+		imagem.pixels[i] = (Cor *) calloc(imagem.lar, sizeof(Cor));
+		if (!imagem.pixels[i])
+			exit(1);
 	}
 
 	/* lendo pixels da imagem e atribuindo à matriz */
@@ -148,13 +146,31 @@ void salvarImagem(Imagem *imagem){
 }
 
 /****************************************************
+Função: checaImagem
+Parâmetros: inteiro imagemAberta, inteiro temArquivo, arquivo tipo FILE
+Retorno: inteiro
+
+Descrição: verifica se há uma imagem aberta, se não houver, limpa o
+buffer e retorna 0. Se existir uma imagem aberta, será retornado 1.
+*****************************************************/
+int checaImagem(int imagemAberta, int temArquivo, FILE *arq){
+	if (!imagemAberta){
+			printf("Erro: imagem nao aberta\n");
+			limparBuffer(temArquivo, arq);
+			return 0;
+		}
+
+	return 1;
+}
+
+/****************************************************
 Função: limparImagem
 Parâmetros: ponteiro tipo Imagem
 Retorno: nenhum
 
 Descrição: limpa toda a imagem para uma cor especificada
 *****************************************************/
-void limparImagem(Imagem *imagem, Cor cor){
+void limparImagem(Imagem *imagem, Cor cor, int imagemAberta, int temArquivo, FILE *arqEspecificacao){
 	for (int i = 0; i < imagem->alt; ++i)
 		for (int j = 0; j < imagem->lar; ++j){
 			imagem->pixels[i][j].r = cor.r;
@@ -162,14 +178,32 @@ void limparImagem(Imagem *imagem, Cor cor){
 			imagem->pixels[i][j].b = cor.b;
 		}
 
-	/* liberando alocação de polígonos */
-	if (imagem->desenho.numPoligonos > 0){
-		for (int i = 0; i < imagem->desenho.numPoligonos; ++i)
-			free(imagem->desenho.poligonos[i].linhas);
-	}
-
 	/* todos os desenhos serão apagados */
 	imagem->desenho = criarDesenho();
+}
+
+/****************************************************
+Função: criarPreenchimento
+Parâmetros: ponto p, tipo Cor, ponteiro tipo Imagem
+Retorno: nenhum
+
+Descrição: armazena as informações sobre o preenchimento numa estrutura
+tipo Preencher e insere na estrutura de desenhos
+*****************************************************/
+void criarPreenchimento(Ponto p, Cor novaCor, Imagem *imagem){
+	Preencher fill;
+	fill.novaCor = novaCor;
+
+	/* atribuindo coordenadas do pixel selecionado */
+	fill.ponto.x = p.x;
+	fill.ponto.y = p.y;
+
+	/* atribuindo cor do pixel selecionado */
+	fill.cor = imagem->pixels[p.y][p.x];
+
+	/* inserindo preenchimento na estrutura de desenho */
+	int n = imagem->desenho.numPreencher++;
+	imagem->desenho.preencher[n] = fill;
 }
 
 /****************************************************
@@ -230,7 +264,10 @@ Retorno: nenhum
 
 Descrição: imprime na tela todos os desenhos feitos na imagem
 *****************************************************/
-void listarDesenhos(Desenho d){
+void listarDesenhos(Desenho d, int temArquivo){
+	if (temArquivo)
+			printf("\n"); // quebra de linha final
+
 	int count = 0;
 	/* listar linhas */
 	for (int i = 0; i < d.numLinhas; ++i){
@@ -280,14 +317,14 @@ Descrição: aplica todos os desenhos na matriz de pixel, essa função é
 chamada apenas na etapa de salvamento do arquivo ppm
 *****************************************************/
 void inserirDesenhos(Imagem *imagem){
-	/* inserindo linhas */
-	for (int i = 0; i < imagem->desenho.numLinhas; ++i){
-		inserirLinha(imagem->desenho.linhas[i], imagem);
-	}
-
 	/* inserindo poligonos */
 	for (int i = 0; i < imagem->desenho.numPoligonos; ++i){
 		inserirPoligono(imagem->desenho.poligonos[i], imagem);
+	}
+	
+	/* inserindo linhas */
+	for (int i = 0; i < imagem->desenho.numLinhas; ++i){
+		inserirLinha(imagem->desenho.linhas[i], imagem);
 	}
 
 	/* inserindo circulos */

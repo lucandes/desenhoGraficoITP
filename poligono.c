@@ -1,5 +1,4 @@
 #include "poligono.h"
-#include "safestdlib.h"
 
 /****************************************************
 Função: criarPoligono
@@ -9,9 +8,9 @@ Retorno: estrutura Polígono
 Descrição: gera uma estrutura de polígono, atribui as informações
 do polígono e retorna a estrutura.
 *****************************************************/
-Poligono criarPoligono(int numFaces, Ponto *pontos, Cor cor){
+void criarPoligono(int numFaces, Ponto *pontos, Imagem *imagem){
 	Poligono pol;
-	pol.numFaces = numFaces; 
+	pol.numFaces = numFaces;
 
 	Ponto p[2]; // vetor utilizado para gerar linhas
 	int i; // contador
@@ -25,15 +24,16 @@ Poligono criarPoligono(int numFaces, Ponto *pontos, Cor cor){
 		p[0] = pontos[i - 1];
 		p[1] = pontos[i];
 
-		pol.linhas[i-1] = criarLinha(p, cor);
+		pol.linhas[i-1] = criarLinha(p, imagem->cor, imagem);
 	}
 
 	/* criando uma linha do ultimo ponto ao primeiro */
 	p[0] = pontos[numFaces - 1];
 	p[1] = pontos[0];
-	pol.linhas[i] = criarLinha(p, cor);
+	pol.linhas[i - 1] = criarLinha(p, imagem->cor, imagem);
 
-	return pol;
+	int n = imagem->desenho.numPoligonos++;
+	imagem->desenho.poligonos[n] = pol;
 }
 
 /****************************************************
@@ -45,6 +45,30 @@ Descrição: insere na imagem todos os polígonos criados
 *****************************************************/
 void inserirPoligono(Poligono pol, Imagem *imagem){
 	/* inserindo todas as linhas do polígono na imagem */
-	for (int i = 0; i < pol.numFaces + 1; ++i)
+	for (int i = 0; i < pol.numFaces; ++i)
 		inserirLinha(pol.linhas[i], imagem);
+}
+
+/****************************************************
+Função: gerarPontosRet
+Parâmetros: ponto inicial do retângulo, vetor de pontos, dimensões do retângulo
+Retorno: nenhum
+
+Descrição: atribui os pontos do retângulo ao vetor de pontos com base
+no ponto inicial e dimensões informadas pelo usuário.
+*****************************************************/
+void gerarPontosRet(Ponto pontoInicial, Ponto pontos[4], int dim[2]){
+	int distX = dim[0];
+	int distY = dim[1];
+
+	pontos[0] = pontoInicial;
+
+	pontos[1] = pontos[0];
+	pontos[1].x += distX;
+
+	pontos[2] = pontos[1];
+	pontos[2].y += distY;
+
+	pontos[3] = pontos[0];
+	pontos[3].y += distY;
 }

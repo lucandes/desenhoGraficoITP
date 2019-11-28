@@ -99,4 +99,7 @@ typedef struct imagem {
 	Desenho desenho;
 }Imagem;
 
+Cor criarCor(int temArquivo, FILE *arq);
+void pintarPixel(int x, int y, Imagem *imagem, Cor cor);
+
 #endif

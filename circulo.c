@@ -1,5 +1,4 @@
 #include "circulo.h"
-#include "func.h"
 
 /****************************************************
 Função: criarCirculo
@@ -8,13 +7,15 @@ Retorno: tipo Circulo
 
 Descrição: gera um círculo a partir dos parâmetros recebidos e o retorna
 *****************************************************/
-Circulo criarCirculo(Ponto centro, int raio, Cor cor){
+Circulo criarCirculo(Ponto centro, int raio, Cor cor, Imagem *imagem){
 	Circulo c;
 	c.centro = centro;
 	c.raio = raio;
 	c.cor = cor;
 
-	return c;
+	/* adicionando aos desenhos da imagem */
+	int n = imagem->desenho.numCirculos++;
+	imagem->desenho.circulos[n] = c;
 }
 
 /****************************************************

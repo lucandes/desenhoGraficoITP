@@ -1,7 +1,7 @@
 all: main
 
-main: main.o func.o imagem.o poligono.o extra.o circulo.o linha.o safestdlib.o
-	gcc main.o func.o imagem.o poligono.o extra.o circulo.o linha.o safestdlib.o -o main
+main: main.o func.o imagem.o poligono.o extra.o circulo.o linha.o struct.o
+	gcc main.o func.o imagem.o poligono.o extra.o circulo.o linha.o struct.o -o main
 
 main.o: main.c
 	gcc -c main.c
@@ -24,8 +24,8 @@ circulo.o: circulo.c
 linha.o: linha.c
 	gcc -c linha.c
 
-safestdlib.o: safestdlib.c
-	gcc -c safestdlib.c
+struct.o: struct.c
+	gcc -c struct.c
 
 clean:
 	rm -rf *.o main

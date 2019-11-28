@@ -21,7 +21,7 @@ int main(){
 	do {
 		/* leitura do comando */
 		if (temArquivo){
-			eof = lerDoArquivo(arqEspecificacao, entrada);
+			eof = lerArquivo(arqEspecificacao, entrada);
 
 			/* se o arquivo chegou ao fim */
 			if (eof){
@@ -39,7 +39,8 @@ int main(){
 
 	
 
-		/* aqui são checados apenas os comandos principais */
+		/* aqui são checados apenas os comandos que não dependem de imagem aberta para serem executados */
+
 		if (!strcmp(entrada, "imagem") || !strcmp(entrada, "image")){
 			/* se já existir uma imagem aberta, sua alocação será liberada */
 			if (imagemAberta)
@@ -48,10 +49,7 @@ int main(){
 			/* leitura das dimensões da imagem */
 			int dim[2];
 			lerInteiros(dim, 2, temArquivo, arqEspecificacao);
-			if (temArquivo){
-				getc(arqEspecificacao); // recebendo o \n
-				printf("\n");
-			}
+			limparBuffer(temArquivo, arqEspecificacao);
 
 			imagem = criarImagem(&imagemAberta, dim[0], dim[1]);
 		}
@@ -95,44 +93,33 @@ int main(){
 			sair = 1;
 		}
 
-		else if (!strcmp(entrada, "salvar") || !strcmp(entrada, "save")){
-			/* caso não exista uma imagem para ser salva */
-			if (!imagemAberta){
-				printf("Erro: imagem nao aberta\n");
-				limparBuffer();
-				continue;
-			}
-
-			/* leitura do nome do arquivo */
-			if (!temArquivo){
-				getc(stdin); // pegando o espaço entre o comando e o nome do arquivo
-				fgets(imagem.nomeDoArquivo, 50, stdin);
-				imagem.nomeDoArquivo[strlen(imagem.nomeDoArquivo) - 1] = '\0';
-			}
-			else {
-				fgets(imagem.nomeDoArquivo, 50, arqEspecificacao);
-				if (imagem.nomeDoArquivo[strlen(imagem.nomeDoArquivo) - 1] == '\n')
-					imagem.nomeDoArquivo[strlen(imagem.nomeDoArquivo) - 1] = '\0';
-				printf(" %s\n", imagem.nomeDoArquivo);
-			}
-
-			
-			salvarImagem(&imagem);
-		}
-
 		else if (!strcmp(entrada, "ler") || !strcmp(entrada, "read")){
 			/* leitura do caminho do arquivo de especificação */
 			getc(stdin); // pegando o espaço entre o comando e o nome do arquivo
 			fgets(imagem.caminho, 100, stdin);
 			imagem.caminho[ strlen(imagem.caminho) - 1 ] = '\0'; // removendo o '\n' do final da string
 
-			arqEspecificacao = lerArquivo(&temArquivo, imagem);
+			arqEspecificacao = novoArquivo(&temArquivo, imagem);
 
 			if (!temArquivo){
 				printf("Erro: caminho de arquivo invalido\n");
 				continue;
 			}
 		}
+
+		else if (!strcmp(entrada, "cor") || !strcmp(entrada, "color")){
+			Cor cor;
+			cor = criarCor(temArquivo, arqEspecificacao);
+			limparBuffer(temArquivo, arqEspecificacao);
+
+			imagem.cor = cor;
+		}
+
+		else if (!strcmp(entrada, "ajuda") || !strcmp(entrada, "help")){
+			printAjuda(temArquivo);
+		}
+
+		
 		
 		else {
 			executar(entrada, &imagem, imagemAberta, temArquivo, arqEspecificacao);

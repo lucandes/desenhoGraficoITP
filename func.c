@@ -1,61 +1,165 @@
-#include <stdio.h>
-#include <string.h>
-
-#include "struct.h"
-#include "imagem.h"
-#include "linha.h"
-#include "poligono.h"
-#include "circulo.h"
-#include "safestdlib.h"
 #include "func.h"
 
-
 /****************************************************
-Função: criarCor
-Parâmetros: nenhum
-Retorno: tipo Cor
+Função: executar
+Parâmetros: entrada do usuário, estrutura tipo Imagem
+Retorno: nenhum
 
-Descrição: cria uma cor com valores RGB informados pelo usuário
+Descrição: lê e interpreta a entrada do usuário, caso a entrada
+seja compatível com um comando do programa, este será executado.
 *****************************************************/
-Cor criarCor(int temArquivo, FILE *arq){
-	Cor cor;
-	int r,g,b;
+void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo, FILE *arqEspecificacao){
+	if (!imagemAberta){
+		printf("Erro: nao existe uma imagem aberta\n");
+		limparBuffer(temArquivo, arqEspecificacao);
+		return;
+	}
+	/* comando limpar */
+	if (!strcmp(entrada, "limpar") || !strcmp(entrada, "clear")){
+		Cor cor = criarCor(temArquivo, arqEspecificacao);
+		limparBuffer(temArquivo, arqEspecificacao);
 
-	if (!temArquivo)
-		scanf(" %d %d %d", &r, &g, &b);
-	else {
-		fscanf(arq, " %d %d %d\n", &r, &g, &b);
-		printf(" %d %d %d\n", r, g, b);
+		limparImagem(imagem, cor, imagemAberta, temArquivo, arqEspecificacao);
 	}
 
-	cor.r = r;
-	cor.g = g;
-	cor.b = b;
+	/* comando linha */
+	else if (!strcmp(entrada, "linha") || !strcmp(entrada, "line")){
+		Ponto pontos[2];
+		lerPontos(pontos, 2, temArquivo, arqEspecificacao);
+		limparBuffer(temArquivo, arqEspecificacao);
 
-	return cor;
+		/* verifica se as entradas são válidas */
+		int valido;
+		valido = verificaCoordenadas(pontos[0].x, pontos[0].y, imagem) &&
+				 verificaCoordenadas(pontos[1].x, pontos[1].y, imagem);
+		if (!valido)
+			return;
+		
+		Linha l;
+		l = criarLinha(pontos, imagem->cor, imagem);
+
+		/* adicionando linha à estrutura linha */
+		int n = imagem->desenho.numLinhas++;
+		imagem->desenho.linhas[n] = l;
+	}
+
+	/* comando retangulo */
+	else if (!strcmp(entrada, "retangulo") || !strcmp(entrada, "rect")){
+		/* leitura do ponto inicial e das dimensões */
+		Ponto pontoInicial;
+		lerPontos(&pontoInicial, 1, temArquivo, arqEspecificacao);
+		int dimensoes[2];
+		lerInteiros(dimensoes, 2, temArquivo, arqEspecificacao);
+		limparBuffer(temArquivo, arqEspecificacao);
+
+		/* definindo coordenadas dos pontos a partir das dimensões */
+		int numFaces = 4;
+		Ponto pontos[numFaces];
+		gerarPontosRet(pontoInicial, pontos, dimensoes);
+		
+		criarPoligono(numFaces, pontos, imagem);
+	}
+
+	/* comando poligono */
+	else if (!strcmp(entrada, "poligono") || !strcmp(entrada, "polygon")){
+		int numFaces; 
+		lerInteiros(&numFaces, 1, temArquivo, arqEspecificacao);
+
+		/* verificando se o número de faces é válido */
+		if (numFaces < 3 || numFaces > 100){
+			printf("Erro: numero inválido de faces inserido\n");
+			limparBuffer(temArquivo, arqEspecificacao);
+			return;
+		}
+
+		Ponto pontos[numFaces];
+		lerPontos(pontos, numFaces, temArquivo, arqEspecificacao);
+		limparBuffer(temArquivo, arqEspecificacao);
+
+		criarPoligono(numFaces, pontos, imagem);
+	}
+
+	/* comando circulo */
+	else if (!strcmp(entrada, "circulo") || !strcmp(entrada, "circle")){
+		Ponto centro;
+		lerPontos(&centro, 1, temArquivo, arqEspecificacao);
+
+		int raio;
+		lerInteiros(&raio, 1, temArquivo, arqEspecificacao);
+		limparBuffer(temArquivo, arqEspecificacao);
+
+		criarCirculo(centro, raio, imagem->cor, imagem);
+	}
+
+	/* comando preencher */
+	else if (!strcmp(entrada, "preencher") || !strcmp(entrada, "fill")){
+		Ponto p;
+		lerPontos(&p, 1, temArquivo, arqEspecificacao);
+
+		Cor novaCor;
+		novaCor = criarCor(temArquivo, arqEspecificacao);
+		limparBuffer(temArquivo, arqEspecificacao);
+
+		criarPreenchimento(p, novaCor, imagem);
+	}
+
+	else if (!strcmp(entrada, "salvar") || !strcmp(entrada, "save")){
+		char *nome = imagem->nomeDoArquivo;
+
+		if (!temArquivo){
+			getc(stdin); // pegando o espaço entre o comando e o nome do arquivo
+			fgets(nome, 50, stdin);
+			nome[strlen(nome) - 1] = '\0';
+		}
+		else {
+			fgets(nome, 50, arqEspecificacao);
+			if (nome[strlen(nome) - 1] == '\n')
+				nome[strlen(nome) - 1] = '\0';
+			printf(" %s\n", nome);
+		}
+
+		salvarImagem(imagem);
+	}
+
+	/* comando desenhos */
+	else if (!strcmp(entrada, "listar") || !strcmp(entrada, "list")){
+		listarDesenhos(imagem->desenho, temArquivo);
+	}
+
+	/* comando inválido */
+	else {
+		if (temArquivo) printf("\n"); // quebra de linha final
+		printf("Erro: '%s' comando invalido. Digite 'ajuda' para ver a lista de comandos\n", entrada);
+		limparBuffer(temArquivo, arqEspecificacao);
+	}
 }
 
 /****************************************************
-Função: pintarPixel
-Parâmetros: coordenadas do pixel, matriz tipo Cor, cor tipo Cor
+Função: printAjuda
+Parâmetros: int temArquivo
 Retorno: nenhum
 
-Descrição: altera a cor do pixel na matriz
+Descrição: imprime a lista de comandos do programa, caso
+tenha arquivo de especificação será realizada uma quebra
+de linha antes da impressão
 *****************************************************/
-void pintarPixel(int x, int y, Imagem *imagem, Cor cor){
-
-	int maxX = imagem->lar - 1;
-	int maxY = imagem->alt - 1;
-
-	/* se o pixel a ser modificado não existir na imagem
-	a função irá ignorá-lo e modificar apenas os que existem */
-	if (x > maxX || y > maxY || x < 0 || y < 0)
-		return;
-
-	// invertido pois a matriz foi inicializada a partir da altura
-	imagem->pixels[y][x].r = cor.r;
-	imagem->pixels[y][x].g = cor.g;
-	imagem->pixels[y][x].b = cor.b;
+void printAjuda(int temArquivo){
+	if (temArquivo) printf("\n");
+	printf("---------------------------------------\n");
+	printf("ajuda                         (imprime a lista de comandos)\n");
+	printf("imagem <lar> <alt>            (gera uma nova imagem)\n");
+	printf("cor <r> <g> <b>               (altera a cor atual do pincel)\n");
+	printf("linha <x1> <y1> <x2> <y2>     (gera uma nova linha)\n");
+	printf("poligono <N> <p1> ... <pN>    (gera um novo poligono)\n");
+	printf("retangulo <x> <y> <lar> <alt> (gera um novo retangulo)\n");
+	printf("circulo <xc> <yc> <raio>      (gera um novo circulo)\n");
+	printf("preencher <x> <y> <r> <g> <b> (preenche a area determinada)\n");
+	printf("lista                         (lista os desenhos da imagem)\n");
+	printf("limpar <r> <g> <b>            (preenche toda a imagem)\n");
+	printf("salvar <nome_do_arquivo.ppm>  (salva em um arquivo ppm)\n");
+	printf("abrir <nome_do_arquivo.ppm>   (carrega uma imagem ppm)\n");
+	printf("ler <nome_do_arquivo>         (le um arquivo de especificacao)\n");
+	printf("sair                          (encerra o programa)\n\n");
 }
 
 /****************************************************
@@ -74,30 +178,20 @@ void liberarAD(Imagem *imagem, Cor **pixels){
 
 /****************************************************
 Função: limparBuffer
-Parâmetros: nenhum
+Parâmetros: inteiro temArquivo, arquivo tipo FILE
 Retorno: nenhum
 
 Descrição: responsável por limpar o buffer de entrada, deve ser chamada
 após um comando inválido, desconsiderando todas as demais 
 informações inseridas pelo usuário
 *****************************************************/
-void limparBuffer(void){
-	/* lê até encontrar uma quebra de linha */
-	while (getchar() != '\n');
-}
-
-/****************************************************
-Função: limparFileBuffer
-Parâmetros: arquivo tipo FILE
-Retorno: nenhum
-
-Descrição: responsável por limpar o buffer de entrada, deve ser chamada
-após um comando inválido, desconsiderando todas as demais 
-informações inseridas pelo usuário
-*****************************************************/
-void limparFileBuffer(FILE *arq){
-	/* lê até encontrar uma quebra de linha */
-	while (getc(arq) != '\n');
+void limparBuffer(int temArquivo, FILE *arq){
+	if (temArquivo){
+		while (getc(arq) != '\n');
+		printf("\n");
+	}
+	else
+		while (getchar() != '\n');
 }
 
 /****************************************************
@@ -127,7 +221,7 @@ Retorno: ponteiro tipo FILE
 Descrição: abre um arquivo no caminho determinado pelo usuário,
 verifica se o foi aberto corretamente e retorna o arquivo.
 *****************************************************/
-FILE *lerArquivo(int *temArquivo, Imagem imagem){
+FILE *novoArquivo(int *temArquivo, Imagem imagem){
 	FILE *arquivo;
 
 	arquivo = fopen(imagem.caminho, "r");
@@ -147,13 +241,14 @@ Parâmetros: ponteiro de arquivo FILE, string entrada
 Retorno: int eof
 
 Descrição: lê o arquivo até encontrar um espaço, quebra de linha ou EOF 
-(fim do arquivo). Retorna 1 se o arquivo acabou e 0 se ainda possui conteúdo.
+(fim do arquivo) e armazena no vetor "entrada". Retorna 1 se o arquivo 
+acabou e 0 se ainda possui conteúdo.
 *****************************************************/
-int lerDoArquivo(FILE *arquivo, char *entrada){
+int lerArquivo(FILE *arquivo, char *entrada){
 	char c = 'a'; // iniciado com char genérico para satisfazer a condição do loop
 	int eof;
 
-	/* será repetido até encontrar um espaço ou quebra de linha no arquivo */
+	/* repetirá até encontrar um espaço ou quebra de linha */
 	for(int i = 0; c != ' ' && c != '\n'; i++){
 		c = getc(arquivo);
 
@@ -170,29 +265,13 @@ int lerDoArquivo(FILE *arquivo, char *entrada){
 }
 
 /****************************************************
-Função: checaImagem
-Parâmetros: inteiro imagemAberta, inteiro temArquivo, arquivo tipo FILE
-Retorno: inteiro
-
-Descrição: verifica se há uma imagem aberta, se não houver, limpa o
-buffer e retorna 0. Se existir uma imagem aberta, será retornado 1.
-*****************************************************/
-int checaImagem(int imagemAberta, int temArquivo, FILE *arq){
-	if (!imagemAberta){
-			printf("Erro: imagem nao aberta\n");
-			temArquivo ? limparFileBuffer(arq): limparBuffer();
-			return 0;
-		}
-
-	return 1;
-}
-
-/****************************************************
 Função: lerInteiros
 Parâmetros: ponteiro de inteiro, numero de inteiros a serem lidos, inteiro temArquivo, arquivo tipo FILE
 Retorno: nenhum
 
-Descrição: 
+Descrição: lê a quantidade determinada de inteiros e os insere 
+no endereço passado por parâmetro, se houver um arquivo de 
+especificação a leitura será realizada no arquivo
 *****************************************************/
 void lerInteiros(int *inteiros, int numInteiros, int temArquivo, FILE *arq){
 	for (int i = 0; i < numInteiros; ++i){
@@ -205,6 +284,15 @@ void lerInteiros(int *inteiros, int numInteiros, int temArquivo, FILE *arq){
 	}
 }
 
+/****************************************************
+Função: lerPontos
+Parâmetros: ponteiro de ponto, numero de pontos a serem lidos, inteiro temArquivo, arquivo tipo FILE
+Retorno: nenhum
+
+Descrição: lê a quantidade determinada de pontos e os insere 
+no endereço que foi passado por parâmetro, se houver um arquivo de 
+especificação a leitura será realizada nesse arquivo
+*****************************************************/
 void lerPontos(Ponto *pontos, int numPontos, int temArquivo, FILE *arq){
 	for (int i = 0; i < numPontos; ++i){
 		if (!temArquivo)
@@ -214,11 +302,16 @@ void lerPontos(Ponto *pontos, int numPontos, int temArquivo, FILE *arq){
 			printf(" %d %d", pontos[i].x, pontos[i].y);
 		}
 	}
-
-	if (temArquivo)
-		printf("\n");
 }
 
+/****************************************************
+Função: verificaCoordenadas
+Parâmetros: inteiro x, inteiro y, ponteiro de imagem
+Retorno: inteiro
+
+Descrição: verifica se o ponto passado por parâmetro está dentro
+das dimensôes da imagem, se sim, retornará 1.
+*****************************************************/
 int verificaCoordenadas(int x, int y, Imagem *imagem){
 	int maxX = imagem->lar - 1;
 	int maxY = imagem->alt - 1;
@@ -229,233 +322,4 @@ int verificaCoordenadas(int x, int y, Imagem *imagem){
 	}
 
 	return 1;
-}
-
-/****************************************************
-Função: gerarPontosRet
-Parâmetros: ponto inicial do retângulo, vetor de pontos, dimensões do retângulo
-Retorno: nenhum
-
-Descrição: atribui os pontos do retângulo ao vetor de pontos com base
-no ponto inicial e dimensões informadas pelo usuário.
-*****************************************************/
-void gerarPontosRet(Ponto pontoInicial, Ponto pontos[4], int dim[2]){
-	int distX = dim[0];
-	int distY = dim[1];
-
-	pontos[0] = pontoInicial;
-
-	pontos[1] = pontos[0];
-	pontos[1].x += distX;
-
-	pontos[2] = pontos[1];
-	pontos[2].y += distY;
-
-	pontos[3] = pontos[0];
-	pontos[3].y += distY;
-}
-
-/****************************************************
-Função: executar
-Parâmetros: entrada do usuário, estrutura tipo Imagem
-Retorno: nenhum
-
-Descrição: lê e interpreta a entrada do usuário, caso a entrada
-seja compatível com um comando do programa, este será executado.
-*****************************************************/
-void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo, FILE *arqEspecificacao){
-	/* comando ajuda */
-	if (!strcmp(entrada, "ajuda") || !strcmp(entrada, "help")){
-		if (temArquivo)
-			printf("\n"); // quebra de linha final
-
-		printf("---------------------------------------\n");
-		printf("ajuda                         (imprime a lista de comandos)\n");
-		printf("imagem <lar> <alt>            (gera uma nova imagem)\n");
-		printf("cor <r> <g> <b>               (altera a cor atual do pincel)\n");
-		printf("linha <x1> <y1> <x2> <y2>     (gera uma nova linha)\n");
-		printf("poligono <N> <p1> ... <pN>    (gera um novo poligono)\n");
-		printf("retangulo <x> <y> <lar> <alt> (gera um novo retangulo)\n");
-		printf("circulo <raio> <xc> <yc>      (gera um novo circulo)\n");
-		printf("preencher <x> <y> <r> <g> <b> (preenche a area determinada)\n");
-		printf("lista                         (lista os desenhos da imagem)\n");
-		printf("limpar <r> <g> <b>            (preenche toda a imagem)\n");
-		printf("salvar <nome_do_arquivo.ppm>  (salva em um arquivo ppm)\n");
-		printf("abrir <nome_do_arquivo.ppm>   (carrega uma imagem ppm)\n");
-		printf("ler <nome_do_arquivo>         (le um arquivo de especificacao)\n");
-		printf("sair                          (encerra o programa)\n\n");
-	}
-
-	/* comando limpar */
-	else if (!strcmp(entrada, "limpar") || !strcmp(entrada, "clear")){
-		/* verifica se existem uma imagem aberta */
-		if (!checaImagem(imagemAberta, temArquivo, arqEspecificacao))
-			return;
-
-		Cor cor = criarCor(temArquivo, arqEspecificacao);
-
-		limparImagem(imagem, cor);
-	}
-
-	/* comando linha */
-	else if (!strcmp(entrada, "linha") || !strcmp(entrada, "line")){
-		/* verifica se existem uma imagem aberta */
-		if (!checaImagem(imagemAberta, temArquivo, arqEspecificacao))
-			return;
-
-		Ponto pontos[2];
-
-		/* leitura de entrada */
-		lerPontos(pontos, 2, temArquivo, arqEspecificacao);
-		if (temArquivo){
-			limparFileBuffer(arqEspecificacao);
-		}
-
-		/* verifica se as entradas são válidas */
-		for (int i = 0; i < 2; ++i){
-			if (!verificaCoordenadas(pontos[i].x, pontos[i].y, imagem))
-				return;
-		}
-		
-		Linha l;
-		l = criarLinha(pontos, imagem->cor);
-
-		/* adicionando linha à estrutura linha */
-		imagem->desenho.linhas[imagem->desenho.numLinhas] = l;
-		imagem->desenho.numLinhas += 1;
-	}
-
-	/* comando retangulo */
-	else if (!strcmp(entrada, "retangulo") || !strcmp(entrada, "rect")){
-		/* verifica se existem uma imagem aberta */
-		if (!checaImagem(imagemAberta, temArquivo, arqEspecificacao))
-			return;
-
-		int numFaces = 4;
-
-		/* leitura do ponto inicial */
-		Ponto pontoInicial;
-		lerPontos(&pontoInicial, 1, temArquivo, arqEspecificacao);
-
-		/* leitura das dimensões do retângulo */
-		int dim[2];
-		lerInteiros(dim, 2, temArquivo, arqEspecificacao);
-		if (temArquivo){
-			limparFileBuffer(arqEspecificacao);
-			printf("\n");
-		}
-
-		/* definindo coordenadas dos pontos a partir das dimensões */
-		Ponto pontos[4];
-		gerarPontosRet(pontoInicial, pontos, dim);
-		
-		Poligono pol;
-		pol = criarPoligono(numFaces, pontos, imagem->cor);
-
-		/* adicionando poligono à estrutura de desenhos */
-		int n = imagem->desenho.numPoligonos++;
-		imagem->desenho.poligonos[n] = pol;
-	}
-
-	/* comando poligono */
-	else if (!strcmp(entrada, "poligono") || !strcmp(entrada, "polygon")){
-		/* verifica se existem uma imagem aberta */
-		if (!checaImagem(imagemAberta, temArquivo, arqEspecificacao))
-			return;
-
-		/* leitura de numero de faces do polígono */
-		int numFaces; 
-		lerInteiros(&numFaces, 1, temArquivo, arqEspecificacao);
-
-
-		/* verificando se o número de faces é válido */
-		if (numFaces < 3 || numFaces > 100){
-			printf("Erro: numero inválido de faces inserido\n");
-			temArquivo ? limparFileBuffer(arqEspecificacao) : limparBuffer();
-		}
-
-		Ponto pontos[numFaces];
-
-		/* leitura de pontos*/
-		lerPontos(pontos, numFaces, temArquivo, arqEspecificacao);
-		
-		Poligono pol;
-		pol = criarPoligono(numFaces, pontos, imagem->cor);
-
-		/* adicionando poligono à estrutura de desenhos */
-		int n = imagem->desenho.numPoligonos++;
-		imagem->desenho.poligonos[n] = pol;
-	}
-
-	/* comando circulo */
-	else if (!strcmp(entrada, "circulo") || !strcmp(entrada, "circle")){
-		/* verifica se existem uma imagem aberta */
-		if (!checaImagem(imagemAberta, temArquivo, arqEspecificacao))
-			return;
-
-		/* leitura do raio */
-		int raio;
-		lerInteiros(&raio, 1, temArquivo, arqEspecificacao);
-
-		/* leitura das coordenadas do centro do círculo */
-		Ponto centro;
-		lerPontos(&centro, 1, temArquivo, arqEspecificacao);
-
-		temArquivo ? limparFileBuffer(arqEspecificacao) : limparBuffer();
-
-		Circulo c;
-		c = criarCirculo(centro, raio, imagem->cor);
-
-		/* inserindo circulo na estrutura de desenho */
-		int n = imagem->desenho.numCirculos++; // será acrescentado mais um em numCirculos após atribuir
-		imagem->desenho.circulos[n] = c;
-	}
-
-	/* comando preencher */
-	else if (!strcmp(entrada, "preencher") || !strcmp(entrada, "fill")){
-		/* verifica se existem uma imagem aberta */
-		if (!checaImagem(imagemAberta, temArquivo, arqEspecificacao))
-			return;
-
-		Preencher p;
-		/* leitura de entradas do usuário */
-		lerPontos(&p.ponto, 1, temArquivo, arqEspecificacao);
-		p.novaCor = criarCor(temArquivo, arqEspecificacao);
-
-		/* atribuindo cor do pixel selecionado à estrutura */
-		p.cor = imagem->pixels[p.ponto.y][p.ponto.x];
-
-		/* inserindo preenchimento na estrutura de desenho */
-		int n = imagem->desenho.numPreencher++; // será acrescentado mais um em numPreencher após atribuir
-		imagem->desenho.preencher[n] = p;
-	}
-
-	/* comando cor */
-	else if (!strcmp(entrada, "cor") || !strcmp(entrada, "color")){
-		Cor cor;
-		cor = criarCor(temArquivo, arqEspecificacao);
-
-		imagem->cor = cor;
-	}
-
-	/* comando desenhos */
-	else if (!strcmp(entrada, "listar") || !strcmp(entrada, "list")){
-		/* verifica se existem uma imagem aberta */
-		if (!checaImagem(imagemAberta, temArquivo, arqEspecificacao))
-			return;
-
-		if (temArquivo)
-			printf("\n"); // quebra de linha final
-
-		listarDesenhos(imagem->desenho);
-	}
-
-	/* comando inválido */
-	else {
-		if (temArquivo)
-			printf("\n"); // quebra de linha final
-
-		printf("Erro: '%s' comando invalido. Digite 'ajuda' para ver a lista de comandos\n", entrada);
-		limparBuffer();
-	}
 }

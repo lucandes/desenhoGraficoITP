@@ -280,8 +280,10 @@ void listarDesenhos(Desenho d, int temArquivo){
 
 	int count = 0;
 	/* listar linhas */
+	if (d.numLinhas)
+		printf("--------------LINHAS---------------\n");
 	for (int i = 0; i < d.numLinhas; ++i){
-		printf("linha %02d - p1 (%d,%d), p2 (%d,%d)\n", 
+		printf("- linha %02d - p1 (%d,%d), p2 (%d,%d)\n", 
 			i+1, 
 			d.linhas[i].inicio.x,
 			d.linhas[i].inicio.y,
@@ -291,8 +293,10 @@ void listarDesenhos(Desenho d, int temArquivo){
 	}
 
 	/* listar poligonos */
+	if (d.numPoligonos)
+		printf("-------------POLIGONOS-------------\n");
 	for (int i = 0; i < d.numPoligonos; ++i){
-		printf("poligono %02d -", i+1);
+		printf("- poligono %02d -", i+1);
 		
 		for (int j = 0; j < d.poligonos[i].numFaces; ++j){
 			printf(" p%d (%d,%d)", 
@@ -305,8 +309,10 @@ void listarDesenhos(Desenho d, int temArquivo){
 	}
 
 	/* listar circulos */
+	if (d.numCirculos)
+		printf("-------------CIRCULOS--------------\n");
 	for (int i = 0; i < d.numCirculos; ++i){
-		printf("circulo %02d - raio: %d, centro: (%d,%d)\n", 
+		printf("- circulo %02d - raio: %d, centro: (%d,%d)\n", 
 			i+1,
 			d.circulos[i].raio,
 			d.circulos[i].centro.x,
@@ -314,8 +320,24 @@ void listarDesenhos(Desenho d, int temArquivo){
 		count++;
 	}
 
+	/* listar preenchimentos */
+	if (d.numPreencher)
+		printf("-------------PREENCHER-------------\n");
+	for (int i = 0; i < d.numPreencher; ++i){
+		printf("- preencher %02d - ponto: (%d,%d) cor (%d, %d, %d)\n", 
+			i+1,
+			d.preencher[i].ponto.x,
+			d.preencher[i].ponto.y,
+			d.preencher[i].novaCor.r,
+			d.preencher[i].novaCor.g,
+			d.preencher[i].novaCor.b);
+		count++;
+	}
+
 	if (!count)
-		printf("A imagem atual nao possui desenhos\n");
+		printf("A imagem atual nao possui desenhos\n\n");
+	else
+		printf("-----------------------------------\n\n");
 }
 
 /****************************************************

@@ -60,6 +60,7 @@ int main(){
 			limparBuffer(temArquivo, arqEspecificacao);
 
 			imagem = criarImagem(&imagemAberta, dim[0], dim[1]);
+			autosave = 0;
 		}
 
 		else if (!strcmp(entrada, "abrir") || !strcmp(entrada, "open")){
@@ -82,6 +83,7 @@ int main(){
 			}
 
 			imagem = abrirImagem(&imagemAberta, imagem.caminho);
+			autosave = 0;
 			
 			if (!imagemAberta){
 				printf("Erro: nao foi possivel abrir a imagem\n");
@@ -112,6 +114,7 @@ int main(){
 			imagem.caminho[ strlen(imagem.caminho) - 1 ] = '\0'; // removendo o '\n' do final da string
 
 			arqEspecificacao = novoArquivo(&temArquivo, imagem);
+			autosave = 0;
 
 			if (!temArquivo){
 				printf("Erro: caminho de arquivo invalido\n");

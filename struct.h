@@ -98,11 +98,14 @@ typedef struct imagem {
 	int numDePixels;
 
 	Cor **pixels;
+	Cor **pixelsCopy;
 	Cor cor;
 	Desenho desenho;
 }Imagem;
 
 Cor criarCor(int temArquivo, FILE *arq);
 void pintarPixel(int x, int y, Imagem *imagem, Cor cor);
+void lerInteiros(int *inteiros, int numInteiros, int temArquivo, FILE *arq);
+void lerPontos(Ponto *pontos, int numPontos, int temArquivo, FILE *arq);
 
 #endif

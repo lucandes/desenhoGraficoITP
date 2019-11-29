@@ -4,6 +4,7 @@
 
 #include "struct.h"
 #include "func.h"
+#include "executar.h"
 
 void imprimirApresentacao();
 
@@ -14,6 +15,7 @@ int main(){
 	int imagemAberta = 0;   // indica se existe uma imagem aberta no programa
 	Imagem imagem;          // receberá todas as informações correspondentes a imagem
 	FILE *arqEspecificacao; // armazena o arquivo de especificação
+	int autosave = 0;       // indica se o arquivo deverá ser salvo automaticamente
 	int temArquivo = 0;     // se houver um arquivo de especificação 'temArquivo' será 1
 	int eof;                // se o arquivo de especificação chegou ao fim 'eof' será 1
 
@@ -47,8 +49,10 @@ int main(){
 
 		if (!strcmp(entrada, "imagem") || !strcmp(entrada, "image")){
 			/* se já existir uma imagem aberta, sua alocação será liberada */
-			if (imagemAberta)
+			if (imagemAberta){
 				liberarAD(&imagem, imagem.pixels);
+				liberarAD(&imagem, imagem.pixelsCopy);
+			}
 
 			/* leitura das dimensões da imagem */
 			int dim[2];
@@ -60,8 +64,10 @@ int main(){
 
 		else if (!strcmp(entrada, "abrir") || !strcmp(entrada, "open")){
 			/* se já existir uma imagem aberta, sua alocação será liberada */
-			if (imagemAberta)
+			if (imagemAberta){
 				liberarAD(&imagem, imagem.pixels);
+				liberarAD(&imagem, imagem.pixelsCopy);
+			}
 
 			/* leitura do caminho do arquivo */
 			if (!temArquivo){
@@ -85,8 +91,10 @@ int main(){
 
 		else if (!strcmp(entrada, "sair") || !strcmp(entrada, "quit")){
 			/* limpa alocação dinâmica */
-			if (imagemAberta)
+			if (imagemAberta){
 				liberarAD(&imagem, imagem.pixels);
+				liberarAD(&imagem, imagem.pixelsCopy);
+			}
 
 			/* fecha o arquivo de especificação */
 			if (temArquivo){
@@ -123,10 +131,8 @@ int main(){
 			printAjuda(temArquivo);
 		}
 
-		
-		
 		else {
-			executar(entrada, &imagem, imagemAberta, temArquivo, arqEspecificacao);
+			executar(entrada, &autosave, &imagem, imagemAberta, temArquivo, arqEspecificacao);
 		}
 	} while (!sair);
 

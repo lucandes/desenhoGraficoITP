@@ -19,14 +19,17 @@ Imagem criarImagem(int *imagemAberta, int lar, int alt){
 	imagem.alt = alt;
 	imagem.numDePixels = imagem.lar * imagem.alt;
 
-	/* alocação dinâmica da matriz pixels */
-	imagem.pixels = (Cor **) malloc(imagem.alt * sizeof(Cor *));
-	if (!imagem.pixels)
+	/* alocação dinâmica da matriz pixels e de sua cópia */
+	imagem.pixels = (Cor **) malloc(alt * sizeof(Cor *));
+	imagem.pixelsCopy = (Cor **) malloc(alt * sizeof(Cor *));
+	if (!imagem.pixels || !imagem.pixelsCopy){
 		exit(1);
+	}
 
-	for (int i = 0; i < imagem.alt; i++){
-		imagem.pixels[i] = (Cor *) calloc(imagem.lar, sizeof(Cor));
-		if (!imagem.pixels[i])
+	for (int i = 0; i < alt; i++){
+		imagem.pixels[i] = (Cor *) malloc(lar * sizeof(Cor));
+		imagem.pixelsCopy[i] = (Cor *) malloc(lar * sizeof(Cor));
+		if (!imagem.pixels[i] || !imagem.pixelsCopy[i])
 			exit(1);
 	}
 
@@ -60,7 +63,6 @@ Descrição: lê um arquivo ppm, atribui a uma estrutura Imagem e
 retorna essa estrutura.
 *****************************************************/
 Imagem abrirImagem(int *imagemAberta, char caminho[100]){
-
 	Imagem imagem;
 	imagem.arquivo = fopen(caminho, "r");
 
@@ -75,14 +77,17 @@ Imagem abrirImagem(int *imagemAberta, char caminho[100]){
 	imagem.numDePixels = imagem.lar * imagem.alt;
 	fscanf(imagem.arquivo, "%d", &imagem.max);
 
-	/* alocação dinâmica da matriz pixels */
+	/* alocação dinâmica da matriz pixels e de sua cópia */
 	imagem.pixels = (Cor **) malloc(imagem.alt * sizeof(Cor *));
-	if (!imagem.pixels)
+	imagem.pixelsCopy = (Cor **) malloc(imagem.alt * sizeof(Cor *));
+	if (!imagem.pixels || !imagem.pixelsCopy){
 		exit(1);
+	}
 
 	for (int i = 0; i < imagem.alt; i++){
-		imagem.pixels[i] = (Cor *) calloc(imagem.lar, sizeof(Cor));
-		if (!imagem.pixels[i])
+		imagem.pixels[i] = (Cor *) malloc(imagem.lar * sizeof(Cor));
+		imagem.pixelsCopy[i] = (Cor *) malloc(imagem.lar * sizeof(Cor));
+		if (!imagem.pixels[i] || !imagem.pixelsCopy[i])
 			exit(1);
 	}
 
@@ -116,17 +121,23 @@ Função: salvarImagem
 Parâmetros: ponteiro tipo Imagem
 Retorno: nenhum
 
-Descrição: cria um novo arquivo ppm e escreve todas as informações
-da imagem dentro dele.
+Descrição: cria um novo arquivo ppm, cria uma cópia da matriz de pixels
+para que os desenhos sejam inseridos sem comprometer a imagem original,
+e escreve todas os valores da matriz no arquivo criado.
 *****************************************************/
 void salvarImagem(Imagem *imagem){
-	/* definindo a pasta galeria como local de salvamento */
-	char nomeArq[50] = "./galeria/";
-	strcat(nomeArq, imagem->nomeDoArquivo);
-	strcpy(imagem->nomeDoArquivo, nomeArq);
+	/* criando cópia da matriz de pixels */
+	for (int y = 0; y < imagem->alt; y++){
+		for (int x = 0; x < imagem->lar; x++){
+			imagem->pixelsCopy[y][x] = imagem->pixels[y][x];
+		}
+	}
 
 	/* criando novo arquivo */
-	imagem->arquivo = fopen(imagem->nomeDoArquivo, "w");
+	char path[100] = {"./galeria/"};
+	strcat(path, imagem->nomeDoArquivo);
+	imagem->arquivo = fopen(path, "w");
+	//printf("arquivo: %s\n", imagem->nomeDoArquivo);
 
 	/* inserindo desenhos na imagem */
 	inserirDesenhos(imagem);
@@ -139,14 +150,9 @@ void salvarImagem(Imagem *imagem){
 	/* escrevendo matriz de pixels no arquivo */
 	for (int y = 0; y < imagem->alt; y++){
 		for (int x = 0; x < imagem->lar; x++){
-			fprintf(imagem->arquivo, "%d ", imagem->pixels[y][x].r);
-			fprintf(imagem->arquivo, "%d ", imagem->pixels[y][x].g);
-			fprintf(imagem->arquivo, "%d ", imagem->pixels[y][x].b);
-			fprintf(imagem->arquivo, "\n");
-			/*fprintf(imagem->arquivo, "%d %d %d\n",
-				imagem->pixels[y][x].r,
-				imagem->pixels[y][x].g,
-				imagem->pixels[y][x].b);*/
+			fprintf(imagem->arquivo, "%d ", imagem->pixelsCopy[y][x].r);
+			fprintf(imagem->arquivo, "%d ", imagem->pixelsCopy[y][x].g);
+			fprintf(imagem->arquivo, "%d\n", imagem->pixelsCopy[y][x].b);
 		}
 	}
 
@@ -198,7 +204,7 @@ Retorno: nenhum
 Descrição: armazena as informações sobre o preenchimento numa estrutura
 tipo Preencher e insere na estrutura de desenhos
 *****************************************************/
-void criarPreenchimento(Ponto p, Cor novaCor, Imagem *imagem){
+Preencher criarPreenchimento(Ponto p, Cor novaCor, Imagem *imagem){
 	Preencher fill;
 	fill.novaCor = novaCor;
 
@@ -206,13 +212,7 @@ void criarPreenchimento(Ponto p, Cor novaCor, Imagem *imagem){
 	fill.ponto.x = p.x;
 	fill.ponto.y = p.y;
 
-	/* inserindo preenchimento na estrutura de desenho */
-	int n = imagem->desenho.numPreencher++;
-	imagem->desenho.preencher[n] = fill;
-
-	/* adicionando o preenchimento à ordem */
-	int i = imagem->desenho.numOrdem++;
-	imagem->desenho.ordem[i] = 4; // 4 representa preencher
+	return fill;
 }
 
 /****************************************************
@@ -230,7 +230,7 @@ void inserirPreenchimento(int x, int y, Preencher p, Imagem *imagem){
 		return;
 
 	Cor corAtual;
-	corAtual = imagem->pixels[y][x]; // cor do pixel atual
+	corAtual = imagem->pixelsCopy[y][x]; // cor do pixel atual
 
 	/* se a cor do pixel atual for diferente da cor do pixel pai (anterior) */
 	if (corAtual.r != p.cor.r || corAtual.g != p.cor.g || corAtual.b != p.cor.b)
@@ -239,7 +239,7 @@ void inserirPreenchimento(int x, int y, Preencher p, Imagem *imagem){
 	//printf("preenchendo (%d,%d)\n", x, y);
 	
 	/* pintando pixel com nova cor */
-	imagem->pixels[y][x] = p.novaCor;
+	imagem->pixelsCopy[y][x] = p.novaCor;
 
 	/* chamada recursiva para os pixels vizinhos */
 	inserirPreenchimento(x+1, y, p, imagem);
@@ -351,7 +351,7 @@ void inserirDesenhos(Imagem *imagem){
 
 		else if (d == 4){
 			Preencher p = imagem->desenho.preencher[pre++];
-			p.cor = imagem->pixels[p.ponto.y][p.ponto.x]; // definindo cor do pixel inicial
+			p.cor = imagem->pixelsCopy[p.ponto.y][p.ponto.x]; // definindo cor do pixel inicial
 			inserirPreenchimento(p.ponto.x, p.ponto.y, p, imagem);
 		}
 	}

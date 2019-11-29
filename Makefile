@@ -1,7 +1,7 @@
 all: main
 
-main: main.o func.o imagem.o poligono.o extra.o circulo.o linha.o struct.o
-	gcc main.o func.o imagem.o poligono.o extra.o circulo.o linha.o struct.o -o main
+main: main.o func.o imagem.o poligono.o executar.o circulo.o linha.o struct.o
+	gcc main.o func.o imagem.o poligono.o executar.o circulo.o linha.o struct.o -o main
 
 main.o: main.c
 	gcc -c main.c
@@ -15,8 +15,8 @@ imagem.o: imagem.c
 poligono.o: poligono.c
 	gcc -c poligono.c
 
-extra.o: extra.c
-	gcc -c extra.c
+executar.o: executar.c
+	gcc -c executar.c
 
 circulo.o: circulo.c
 	gcc -c circulo.c

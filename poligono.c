@@ -8,7 +8,7 @@ Retorno: estrutura Polígono
 Descrição: gera uma estrutura de polígono, atribui as informações
 do polígono e retorna a estrutura.
 *****************************************************/
-void criarPoligono(int numFaces, Ponto *pontos, Imagem *imagem){
+Poligono criarPoligono(int numFaces, Ponto *pontos, Imagem *imagem){
 	Poligono pol;
 	pol.numFaces = numFaces;
 
@@ -32,12 +32,7 @@ void criarPoligono(int numFaces, Ponto *pontos, Imagem *imagem){
 	p[1] = pontos[0];
 	pol.linhas[i - 1] = criarLinha(p, imagem->cor, imagem);
 
-	int n = imagem->desenho.numPoligonos++;
-	imagem->desenho.poligonos[n] = pol;
-
-	/* adicionando o poligono à ordem */
-	int m = imagem->desenho.numOrdem++;
-	imagem->desenho.ordem[m] = 2; // 2 representa poligonos
+	return pol;
 }
 
 /****************************************************

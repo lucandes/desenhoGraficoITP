@@ -1,144 +1,6 @@
 #include "func.h"
 
 /****************************************************
-Função: executar
-Parâmetros: entrada do usuário, estrutura tipo Imagem
-Retorno: nenhum
-
-Descrição: lê e interpreta a entrada do usuário, caso a entrada
-seja compatível com um comando do programa, este será executado.
-*****************************************************/
-void executar(char entrada[10], Imagem *imagem, int imagemAberta, int temArquivo, FILE *arqEspecificacao){
-	if (!imagemAberta){
-		printf("Erro: nao existe uma imagem aberta\n");
-		limparBuffer(temArquivo, arqEspecificacao);
-		return;
-	}
-	/* comando limpar */
-	if (!strcmp(entrada, "limpar") || !strcmp(entrada, "clear")){
-		Cor cor = criarCor(temArquivo, arqEspecificacao);
-		limparBuffer(temArquivo, arqEspecificacao);
-
-		limparImagem(imagem, cor, imagemAberta, temArquivo, arqEspecificacao);
-	}
-
-	/* comando linha */
-	else if (!strcmp(entrada, "linha") || !strcmp(entrada, "line")){
-		Ponto pontos[2];
-		lerPontos(pontos, 2, temArquivo, arqEspecificacao);
-		limparBuffer(temArquivo, arqEspecificacao);
-
-		/* verifica se as entradas são válidas */
-		int valido;
-		valido = verificaCoordenadas(pontos[0].x, pontos[0].y, imagem) &&
-				 verificaCoordenadas(pontos[1].x, pontos[1].y, imagem);
-		if (!valido)
-			return;
-		
-		Linha l;
-		l = criarLinha(pontos, imagem->cor, imagem);
-
-		/* adicionando linha à estrutura linha */
-		int n = imagem->desenho.numLinhas++;
-		imagem->desenho.linhas[n] = l;
-
-		/* adicionando a linha à ordem */
-		int i = imagem->desenho.numOrdem++;
-		imagem->desenho.ordem[i] = 1; // 1 representa linhas
-	}
-
-	/* comando retangulo */
-	else if (!strcmp(entrada, "retangulo") || !strcmp(entrada, "rect")){
-		/* leitura do ponto inicial e das dimensões */
-		Ponto pontoInicial;
-		lerPontos(&pontoInicial, 1, temArquivo, arqEspecificacao);
-		int dimensoes[2];
-		lerInteiros(dimensoes, 2, temArquivo, arqEspecificacao);
-		limparBuffer(temArquivo, arqEspecificacao);
-
-		/* definindo coordenadas dos pontos a partir das dimensões */
-		int numFaces = 4;
-		Ponto pontos[numFaces];
-		gerarPontosRet(pontoInicial, pontos, dimensoes);
-		
-		criarPoligono(numFaces, pontos, imagem);
-	}
-
-	/* comando poligono */
-	else if (!strcmp(entrada, "poligono") || !strcmp(entrada, "polygon")){
-		int numFaces; 
-		lerInteiros(&numFaces, 1, temArquivo, arqEspecificacao);
-
-		/* verificando se o número de faces é válido */
-		if (numFaces < 3 || numFaces > 100){
-			printf("Erro: numero inválido de faces inserido\n");
-			limparBuffer(temArquivo, arqEspecificacao);
-			return;
-		}
-
-		Ponto pontos[numFaces];
-		lerPontos(pontos, numFaces, temArquivo, arqEspecificacao);
-		limparBuffer(temArquivo, arqEspecificacao);
-
-		criarPoligono(numFaces, pontos, imagem);
-	}
-
-	/* comando circulo */
-	else if (!strcmp(entrada, "circulo") || !strcmp(entrada, "circle")){
-		Ponto centro;
-		lerPontos(&centro, 1, temArquivo, arqEspecificacao);
-
-		int raio;
-		lerInteiros(&raio, 1, temArquivo, arqEspecificacao);
-		limparBuffer(temArquivo, arqEspecificacao);
-
-		criarCirculo(centro, raio, imagem->cor, imagem);
-	}
-
-	/* comando preencher */
-	else if (!strcmp(entrada, "preencher") || !strcmp(entrada, "fill")){
-		Ponto p;
-		lerPontos(&p, 1, temArquivo, arqEspecificacao);
-
-		Cor novaCor;
-		novaCor = criarCor(temArquivo, arqEspecificacao);
-		limparBuffer(temArquivo, arqEspecificacao);
-
-		criarPreenchimento(p, novaCor, imagem);
-	}
-
-	else if (!strcmp(entrada, "salvar") || !strcmp(entrada, "save")){
-		char *nome = imagem->nomeDoArquivo;
-
-		if (!temArquivo){
-			getc(stdin); // pegando o espaço entre o comando e o nome do arquivo
-			fgets(nome, 50, stdin);
-			nome[strlen(nome) - 1] = '\0';
-		}
-		else {
-			fgets(nome, 50, arqEspecificacao);
-			if (nome[strlen(nome) - 1] == '\n')
-				nome[strlen(nome) - 1] = '\0';
-			printf(" %s\n", nome);
-		}
-
-		salvarImagem(imagem);
-	}
-
-	/* comando desenhos */
-	else if (!strcmp(entrada, "listar") || !strcmp(entrada, "list")){
-		listarDesenhos(imagem->desenho, temArquivo);
-	}
-
-	/* comando inválido */
-	else {
-		if (temArquivo) printf("\n"); // quebra de linha final
-		printf("Erro: '%s' comando invalido. Digite 'ajuda' para ver a lista de comandos\n", entrada);
-		limparBuffer(temArquivo, arqEspecificacao);
-	}
-}
-
-/****************************************************
 Função: printAjuda
 Parâmetros: int temArquivo
 Retorno: nenhum
@@ -249,67 +111,29 @@ Descrição: lê o arquivo até encontrar um espaço, quebra de linha ou EOF
 acabou, 0 se ainda possui conteúdo e -1 se for um comentário (#).
 *****************************************************/
 int lerArquivo(FILE *arquivo, char *entrada){
-	char c = 'a'; // iniciado com char genérico para satisfazer a condição do loop
-	int eof;
+	char c = 'a'; // iniciado com char genérico
+	int i = 0; // contador
 
-	/* repetirá até encontrar um espaço ou quebra de linha */
-	for(int i = 0; c != ' ' && c != '\n'; i++){
+	while (c != ' ' && c != '\n'){
 		c = getc(arquivo);
 
+		/* verificando se é um comentário */
 		if (c == '#'){
-			while (getc(arquivo) != '\n');
-			return -1;
+			limparBuffer(1, arquivo);
+			return -1; // retorno de comentario
 		}
-		/* se o char for letra será inserido na string, se for 
-		   espaço ou quebra de linha o '\0' é inserido */
-		c == ' ' || c == '\n' ? (entrada[i] = '\0') : (entrada[i] = c);
 
-		/* verifica se chegou ao fim do arquivo */
+		/* caso seja espaço, encerre a string */
+		if (c == ' ' || c == '\n')
+			entrada[i++] = '\0';
+		else
+			entrada[i++] = c;
+
+		/* verificando se chegou ao fim do arquivo*/
 		if (feof(arquivo))
-			return 1;
+			return 1; // retorno de fim de arquivo
 	}
-
 	return 0;
-}
-
-/****************************************************
-Função: lerInteiros
-Parâmetros: ponteiro de inteiro, numero de inteiros a serem lidos, inteiro temArquivo, arquivo tipo FILE
-Retorno: nenhum
-
-Descrição: lê a quantidade determinada de inteiros e os insere 
-no endereço passado por parâmetro, se houver um arquivo de 
-especificação a leitura será realizada no arquivo
-*****************************************************/
-void lerInteiros(int *inteiros, int numInteiros, int temArquivo, FILE *arq){
-	for (int i = 0; i < numInteiros; ++i){
-		if (!temArquivo)
-			scanf(" %d", &inteiros[i]);
-		else {
-			fscanf(arq, " %d", &inteiros[i]);
-			printf(" %d", inteiros[i]);
-		}
-	}
-}
-
-/****************************************************
-Função: lerPontos
-Parâmetros: ponteiro de ponto, numero de pontos a serem lidos, inteiro temArquivo, arquivo tipo FILE
-Retorno: nenhum
-
-Descrição: lê a quantidade determinada de pontos e os insere 
-no endereço que foi passado por parâmetro, se houver um arquivo de 
-especificação a leitura será realizada nesse arquivo
-*****************************************************/
-void lerPontos(Ponto *pontos, int numPontos, int temArquivo, FILE *arq){
-	for (int i = 0; i < numPontos; ++i){
-		if (!temArquivo)
-			scanf(" %d %d", &pontos[i].x, &pontos[i].y);
-		else {
-			fscanf(arq, " %d %d", &pontos[i].x, &pontos[i].y);
-			printf(" %d %d", pontos[i].x, pontos[i].y);
-		}
-	}
 }
 
 /****************************************************

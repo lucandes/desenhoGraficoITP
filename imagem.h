@@ -11,7 +11,7 @@ Imagem criarImagem(int *imagemAberta, int lar, int alt);
 Imagem abrirImagem(int *imagemAberta, char caminho[100]);
 void salvarImagem(Imagem *imagem);
 void limparImagem(Imagem *imagem, Cor cor, int imagemAberta, int temArquivo, FILE *arqEspecificacao);
-void criarPreenchimento(Ponto p, Cor novaCor, Imagem *imagem);
+Preencher criarPreenchimento(Ponto p, Cor novaCor, Imagem *imagem);
 int checaImagem(int imagemAberta, int temArquivo, FILE *arq);
 Desenho criarDesenho(void);
 void listarDesenhos(Desenho d, int temArquivo);

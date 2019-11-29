@@ -11,21 +11,28 @@ de linha antes da impressão
 *****************************************************/
 void printAjuda(int temArquivo){
 	if (temArquivo) printf("\n");
-	printf("---------------------------------------\n");
-	printf("ajuda                         (imprime a lista de comandos)\n");
-	printf("imagem <lar> <alt>            (gera uma nova imagem)\n");
-	printf("cor <r> <g> <b>               (altera a cor atual do pincel)\n");
-	printf("linha <x1> <y1> <x2> <y2>     (gera uma nova linha)\n");
-	printf("poligono <N> <p1> ... <pN>    (gera um novo poligono)\n");
-	printf("retangulo <x> <y> <lar> <alt> (gera um novo retangulo)\n");
-	printf("circulo <xc> <yc> <raio>      (gera um novo circulo)\n");
-	printf("preencher <x> <y> <r> <g> <b> (preenche a area determinada)\n");
-	printf("lista                         (lista os desenhos da imagem)\n");
-	printf("limpar <r> <g> <b>            (preenche toda a imagem)\n");
-	printf("salvar <nome_do_arquivo.ppm>  (salva em um arquivo ppm)\n");
-	printf("abrir <nome_do_arquivo.ppm>   (carrega uma imagem ppm)\n");
-	printf("ler <nome_do_arquivo>         (le um arquivo de especificacao)\n");
-	printf("sair                          (encerra o programa)\n\n");
+	printf("---------COMANDOS PADRAO----------\n");
+	printf("ajuda                               (imprime a lista de comandos)\n");
+	printf("imagem <lar> <alt>                  (gera uma nova imagem)\n");
+	printf("cor <r> <g> <b>                     (altera a cor atual do pincel)\n");
+	printf("linha <x1> <y1> <x2> <y2>           (gera uma nova linha)\n");
+	printf("poligono <N> <p1> ... <pN>          (gera um novo poligono)\n");
+	printf("retangulo <x> <y> <lar> <alt>       (gera um novo retangulo)\n");
+	printf("circulo <xc> <yc> <raio>            (gera um novo circulo)\n");
+	printf("preencher <x> <y> <r> <g> <b>       (preenche a area determinada)\n");
+	printf("lista                               (lista os desenhos da imagem)\n");
+	printf("limpar <r> <g> <b>                  (preenche toda a imagem)\n");
+	printf("salvar <nome_do_arquivo.ppm>        (salva em um arquivo ppm)\n");
+	printf("abrir <nome_do_arquivo.ppm>         (carrega uma imagem ppm)\n");
+	printf("ler <nome_do_arquivo>               (le um arquivo de especificacao)\n");
+	printf("sair                                (encerra o programa)\n");
+
+	printf("\n---------COMANDOS  EXTRA----------\n");
+	printf("autosave <nome_do_arquivo>          (habilita o salvamento automatico da imagem)\n");
+	printf("editar <desenho> <id> <nova_config> (permite redefinir as configuracoes do desenho)\n");
+	printf("mover <desenho> <id> <distX> <distY>(permite mover o desenho de posicao)\n");
+	printf("remover <desenho> <id>              (remove o desenho da imagem)\n");
+	printf("\n");
 }
 
 /****************************************************

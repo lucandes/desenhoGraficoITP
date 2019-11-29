@@ -1,7 +1,7 @@
 all: main
 
-main: main.o func.o imagem.o poligono.o executar.o circulo.o linha.o struct.o
-	gcc main.o func.o imagem.o poligono.o executar.o circulo.o linha.o struct.o -o main
+main: main.o func.o imagem.o poligono.o executar.o circulo.o preencher.o linha.o struct.o
+	gcc main.o func.o imagem.o poligono.o executar.o circulo.o preencher.o linha.o struct.o -o main
 
 main.o: main.c
 	gcc -c main.c
@@ -26,6 +26,9 @@ linha.o: linha.c
 
 struct.o: struct.c
 	gcc -c struct.c
+
+preencher.o: preencher.c
+	gcc -c preencher.c
 
 clean:
 	rm -rf *.o main

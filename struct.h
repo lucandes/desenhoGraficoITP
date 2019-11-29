@@ -39,6 +39,7 @@ typedef struct poligono{
 	int numFaces;
 	Ponto pontos[100];
 	Linha linhas[100];
+	Cor cor;
 }Poligono;
 
 /*********************
@@ -107,5 +108,6 @@ Cor criarCor(int temArquivo, FILE *arq);
 void pintarPixel(int x, int y, Imagem *imagem, Cor cor);
 void lerInteiros(int *inteiros, int numInteiros, int temArquivo, FILE *arq);
 void lerPontos(Ponto *pontos, int numPontos, int temArquivo, FILE *arq);
+void lerString(char *string, int tamStr, int temArquivo, FILE *arq);
 
 #endif

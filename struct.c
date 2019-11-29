@@ -72,7 +72,7 @@ Parâmetros: ponteiro de ponto, numero de pontos a serem lidos, inteiro temArqui
 Retorno: nenhum
 
 Descrição: lê a quantidade determinada de pontos e os insere 
-no endereço que foi passado por parâmetro, se houver um arquivo de 
+no endereço passado por parâmetro, se houver um arquivo de 
 especificação a leitura será realizada nesse arquivo
 *****************************************************/
 void lerPontos(Ponto *pontos, int numPontos, int temArquivo, FILE *arq){
@@ -84,4 +84,22 @@ void lerPontos(Ponto *pontos, int numPontos, int temArquivo, FILE *arq){
 			printf(" %d %d", pontos[i].x, pontos[i].y);
 		}
 	}
+}
+
+/****************************************************
+Função: lerString
+Parâmetros: vetor de char, tamanho máximo da string, inteiro temArquivo, arquivo tipo FILE
+Retorno: nenhum
+
+Descrição: lê uma string e os insere no endereço passado 
+por parâmetro, se houver um arquivo de especificação a 
+leitura será realizada nesse arquivo.
+*****************************************************/
+void lerString(char *string, int tamStr, int temArquivo, FILE *arq){
+	if (!temArquivo)
+			scanf("%s", string);
+		else {
+			fscanf(arq, "%s", string);
+			printf(" %s", string);
+		}
 }

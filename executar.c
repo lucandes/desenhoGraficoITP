@@ -139,23 +139,10 @@ void executar(char entrada[10], int *autosave, Imagem *imagem, int imagemAberta,
 
 	/* comando salvar */
 	else if (!strcmp(entrada, "salvar") || !strcmp(entrada, "save")){
-		if (!*autosave){
-			char *nome = imagem->nomeDoArquivo;
-
-			if (!temArquivo){
-				getc(stdin); // pegando o espaço entre o comando e o nome do arquivo
-				fgets(nome, 50, stdin);
-				nome[strlen(nome) - 1] = '\0';
-			}
-			else {
-				fgets(nome, 50, arqEspecificacao);
-				if (nome[strlen(nome) - 1] == '\n')
-					nome[strlen(nome) - 1] = '\0';
-				printf(" %s\n", nome);
-			}
-		}
-
+		if (!*autosave)
+			lerString(imagem->nomeDoArquivo, 100, temArquivo, arqEspecificacao);
 		salvarImagem(imagem);
+		printf("imagem salva em './galeria/%s'\n", imagem->nomeDoArquivo);
 	}
 
 	/* comando listar desenhos */
@@ -163,34 +150,72 @@ void executar(char entrada[10], int *autosave, Imagem *imagem, int imagemAberta,
 		listarDesenhos(imagem->desenho, temArquivo);
 	}
 
-	/* comando editar desenhos */
-	else if (!strcmp(entrada, "editar") || !strcmp(entrada, "edit")){
-		/* verificando se existem desenhos para editar */
-		if (imagem->desenho.numOrdem == 0){
-			printf("Erro: a imagem nao possui desenhos\n");
+	/* comando salvar automaticamente */
+	else if (!strcmp(entrada, "autosave")){
+		char nome[50];
+		lerString(nome, 100, temArquivo, arqEspecificacao);
+
+		if (!strcmp(nome, "cancelar")){
+			if (*autosave == 1){
+				*autosave = 0;
+				printf("Salvamento automatico encerrado\n");
+				return;
+			}
+			printf("Erro: salvamento automatico nao foi habilitado\n");
 			return;
 		}
 
-		editar(temArquivo, arqEspecificacao, imagem);
+		strcpy(imagem->nomeDoArquivo, nome);
+		*autosave = 1;
 	}
 
-	/* comando salvar automaticamente */
-	else if (!strcmp(entrada, "autosave")){
-		char *nome = imagem->nomeDoArquivo;
+	/* comando editar desenhos */
+	else if (!strcmp(entrada, "editar") || !strcmp(entrada, "edit")){
+		char d[15];
+		int dnum;
 
-		if (!temArquivo){
-			getc(stdin); // pegando o espaço entre o comando e o nome do arquivo
-			fgets(nome, 50, stdin);
-			nome[strlen(nome) - 1] = '\0';
-		}
-		else {
-			fgets(nome, 50, arqEspecificacao);
-			if (nome[strlen(nome) - 1] == '\n')
-				nome[strlen(nome) - 1] = '\0';
-			printf(" %s\n", nome);
-		}
+		lerString(d, 15, temArquivo, arqEspecificacao);
+		lerInteiros(&dnum, 1, temArquivo, arqEspecificacao);
 
-		*autosave = 1;
+		editar(d, dnum, temArquivo, arqEspecificacao, imagem);
+	}
+
+	/* comando mover desenhos */
+	else if (!strcmp(entrada, "mover") || !strcmp(entrada, "move")){
+		char d[15];
+		int dnum;
+		int dist[2];
+
+		lerString(d, 15, temArquivo, arqEspecificacao);
+		lerInteiros(&dnum, 1, temArquivo, arqEspecificacao);
+		lerInteiros(dist, 2, temArquivo, arqEspecificacao);
+		limparBuffer(temArquivo, arqEspecificacao);
+
+		mover(d, dnum, dist, temArquivo, arqEspecificacao, imagem);
+	}
+
+	/* comando mover desenhos */
+	else if (!strcmp(entrada, "copiar") || !strcmp(entrada, "copy")){
+		char d[15];
+		int dnum;
+
+		lerString(d, 15, temArquivo, arqEspecificacao);
+		lerInteiros(&dnum, 1, temArquivo, arqEspecificacao);
+		limparBuffer(temArquivo, arqEspecificacao);
+
+		copiar(d, dnum, temArquivo, arqEspecificacao, imagem);
+	}
+
+		/* comando remover desenhos */
+	else if (!strcmp(entrada, "remover") || !strcmp(entrada, "remove")){
+		char d[15];
+		int dnum;
+
+		lerString(d, 15, temArquivo, arqEspecificacao);
+		lerInteiros(&dnum, 1, temArquivo, arqEspecificacao);
+		limparBuffer(temArquivo, arqEspecificacao);
+
+		remover(d, dnum, temArquivo, arqEspecificacao, imagem);
 	}
 
 	/* comando inválido */
@@ -202,9 +227,8 @@ void executar(char entrada[10], int *autosave, Imagem *imagem, int imagemAberta,
 	}
 
 	/* autosave */
-	if (*autosave){
+	if (*autosave)
 		salvarImagem(imagem);
-	}
 }
 
 
@@ -213,141 +237,149 @@ void executar(char entrada[10], int *autosave, Imagem *imagem, int imagemAberta,
 
 
 
+void editar(char desenho[15], int dnum, int temArquivo, FILE *arqEspecificacao, Imagem *imagem){
+	/* verificando se existem desenhos para mover */
+	if (imagem->desenho.numOrdem == 0){
+		printf("Erro: a imagem nao possui desenhos\n");
+		limparBuffer(temArquivo, arqEspecificacao);
+		return;
+	}
 
-void editar(int temArquivo, FILE *arqEspecificacao, Imagem *imagem){
-	/* leitura do tipo de desenho */
-	char desenho[15];
-	int dnum;
-	if (temArquivo)
-		fscanf(arqEspecificacao, "%s %d", desenho, &dnum);
-	else
-		scanf("%s %d", desenho, &dnum);
-
-	/**************** verificando tipo de desenho ******************/
+	/********************* verificando tipo de desenho *********************/
 
 	if (!strcmp(desenho, "linha") || !strcmp(desenho, "line")){
-		/* verifica se a linha existe */
-		if (dnum < 1 || dnum > imagem->desenho.numLinhas){
-			printf("Erro: o desenho selecionado nao existe\n");
-			limparBuffer(temArquivo, arqEspecificacao);
-			return;
-		}
-
-		/**** mesmo código de criar linha da função "executar" ****/
-		Ponto pontos[2];
-		lerPontos(pontos, 2, temArquivo, arqEspecificacao);
-		limparBuffer(temArquivo, arqEspecificacao);
-
-		int valido;
-		valido = verificaCoordenadas(pontos[0].x, pontos[0].y, imagem) &&
-				 verificaCoordenadas(pontos[1].x, pontos[1].y, imagem);
-		if (!valido) return;
-		
-		Linha l;
-		l = criarLinha(pontos, imagem->cor, imagem);
-		/******************** fim do código ***********************/
-
-		/* substituindo linha na estrutura desenho */
-		imagem->desenho.linhas[dnum - 1] = l;
+		editarLinha(dnum, imagem, temArquivo, arqEspecificacao);
 	}
 
 	else if (!strcmp(desenho, "retangulo") || !strcmp(desenho, "rect")){
-		/* verifica se o poligono existe */
-		if (dnum < 1 || dnum > imagem->desenho.numPoligonos){
-			printf("Erro: o desenho selecionado nao existe\n");
-			limparBuffer(temArquivo, arqEspecificacao);
-			return;
-		}
-
-		/**** mesmo código de criar linha da função "executar" ****/
-		Ponto pontoInicial;
-		lerPontos(&pontoInicial, 1, temArquivo, arqEspecificacao);
-		int dimensoes[2];
-		lerInteiros(dimensoes, 2, temArquivo, arqEspecificacao);
-		limparBuffer(temArquivo, arqEspecificacao);
-
-		int numFaces = 4;
-		Ponto pontos[numFaces];
-		gerarPontosRet(pontoInicial, pontos, dimensoes);
-		/******************** fim do código ***********************/
-
-		
-		Poligono pol = criarPoligono(numFaces, pontos, imagem);
-		imagem->desenho.poligonos[dnum - 1] = pol;
+		editarRetangulo(dnum, imagem, temArquivo, arqEspecificacao);
 	}
 
 	else if (!strcmp(desenho, "poligono") || !strcmp(desenho, "polygon")){
-		/* verifica se o poligono existe */
-		if (dnum < 1 || dnum > imagem->desenho.numPoligonos){
-			printf("Erro: o desenho selecionado nao existe\n");
-			limparBuffer(temArquivo, arqEspecificacao);
-			return;
-		}
-
-		int numFaces; 
-		lerInteiros(&numFaces, 1, temArquivo, arqEspecificacao);
-
-		/**** mesmo código de criar linha da função "executar" ****/
-		if (numFaces < 3 || numFaces > 100){
-			printf("Erro: numero inválido de faces inserido\n");
-			limparBuffer(temArquivo, arqEspecificacao);
-			return;
-		}
-
-		Ponto pontos[numFaces];
-		lerPontos(pontos, numFaces, temArquivo, arqEspecificacao);
-		limparBuffer(temArquivo, arqEspecificacao);
-		/******************** fim do código ***********************/
-
-		Poligono pol = criarPoligono(numFaces, pontos, imagem);
-		imagem->desenho.poligonos[dnum - 1] = pol;
+		editarPoligono(dnum, imagem, temArquivo, arqEspecificacao);
 	}
 
 	else if (!strcmp(desenho, "circulo") || !strcmp(desenho, "circle")){
-		/* verifica se o círculo existe */
-		if (dnum < 1 || dnum > imagem->desenho.numCirculos){
-			printf("Erro: o desenho selecionado nao existe\n");
-			limparBuffer(temArquivo, arqEspecificacao);
-			return;
-		}
-
-		/**** mesmo código de criar linha da função "executar" ****/
-		Ponto centro;
-		lerPontos(&centro, 1, temArquivo, arqEspecificacao);
-
-		int raio;
-		lerInteiros(&raio, 1, temArquivo, arqEspecificacao);
-		limparBuffer(temArquivo, arqEspecificacao);
-		/******************** fim do código ***********************/
-
-		Circulo c = criarCirculo(centro, raio, imagem->cor, imagem);
-		imagem->desenho.circulos[dnum - 1] = c;
+		editarCirculo(dnum, imagem, temArquivo, arqEspecificacao);
 	}
 
 	else if (!strcmp(desenho, "preencher") || !strcmp(desenho, "fill")){
-		/* verifica se o preenchimento existe */
-		if (dnum < 1 || dnum > imagem->desenho.numPreencher){
-			printf("Erro: o desenho selecionado nao existe\n");
-			limparBuffer(temArquivo, arqEspecificacao);
-			return;
-		}
-
-		/**** mesmo código de criar linha da função "executar" ****/
-		Ponto p;
-		lerPontos(&p, 1, temArquivo, arqEspecificacao);
-
-		Cor novaCor;
-		novaCor = criarCor(temArquivo, arqEspecificacao);
-		limparBuffer(temArquivo, arqEspecificacao);
-		/******************** fim do código ***********************/
-
-		Preencher fill = criarPreenchimento(p, novaCor, imagem);
-		imagem->desenho.preencher[dnum - 1] = fill;
+		editarPreencher(dnum, imagem, temArquivo, arqEspecificacao);
 	}
 
 	else {
 		printf("Erro: o tipo de desenho inserido nao existe\n");
+	}
+
+	limparBuffer(temArquivo, arqEspecificacao);
+}
+
+void mover(char desenho[15], int dnum, int dist[2], int temArquivo, FILE *arqEspecificacao, Imagem *imagem){
+	/* verificando se existem desenhos para mover */
+	if (imagem->desenho.numOrdem == 0){
+		printf("Erro: a imagem nao possui desenhos\n");
+		return;
+	}
+
+	int retorno;
+
+	/********************* verificando tipo de desenho *********************/
+
+	if (!strcmp(desenho, "linha") || !strcmp(desenho, "line")){
+		retorno = moverLinha(dnum, dist, imagem);
+	}
+	/* retangulos e poligonos gerais são alterados da mesma forma */
+	else if (!strcmp(desenho, "retangulo") || !strcmp(desenho, "rect") ||
+		!strcmp(desenho, "poligono") || !strcmp(desenho, "polygon")){
+		retorno = moverPoligono(dnum, dist, imagem);
+	}
+
+	else if (!strcmp(desenho, "circulo") || !strcmp(desenho, "circle")){
+		retorno = moverCirculo(dnum, dist, imagem);
+	}
+
+	else if (!strcmp(desenho, "preencher") || !strcmp(desenho, "fill")){
+		retorno = moverPreencher(dnum, dist, imagem);
+	}
+
+	if (!retorno){
+		printf("Erro: o desenho selecionado nao existe\n");
+		return;
+	}
+
+	printf("Erro: o desenho selecionado nao existe\n");
+}
+
+void copiar(char desenho[15], int dnum, int temArquivo, FILE *arqEspecificacao, Imagem *imagem){
+	/* verificando se existem desenhos para mover */
+	if (imagem->desenho.numOrdem == 0){
+		printf("Erro: a imagem nao possui desenhos\n");
+		return;
+	}
+
+	int retorno;
+
+	/********************* verificando tipo de desenho *********************/
+
+	if (!strcmp(desenho, "linha") || !strcmp(desenho, "line")){
+		retorno = copiarLinha(dnum, imagem);
+	}
+	/* retangulos e poligonos gerais são alterados da mesma forma */
+	else if (!strcmp(desenho, "retangulo") || !strcmp(desenho, "rect") ||
+		!strcmp(desenho, "poligono") || !strcmp(desenho, "polygon")){
+		retorno = copiarPoligono(dnum, imagem);
+	}
+
+	else if (!strcmp(desenho, "circulo") || !strcmp(desenho, "circle")){
+		retorno = copiarCirculo(dnum, imagem);
+	}
+
+	else if (!strcmp(desenho, "preencher") || !strcmp(desenho, "fill")){
+		retorno = copiarPreencher(dnum, imagem);
+	}
+
+	if (!retorno){
+		printf("Erro: o desenho selecionado nao existe\n");
+		return;
+	}
+
+	printf("Erro: o desenho selecionado nao existe\n");
+}
+
+void remover(char desenho[15], int dnum, int temArquivo, FILE *arqEspecificacao, Imagem *imagem){
+	/* verificando se existem desenhos para mover */
+	if (imagem->desenho.numOrdem == 0){
+		printf("Erro: a imagem nao possui desenhos\n");
 		limparBuffer(temArquivo, arqEspecificacao);
 		return;
 	}
+
+	int retorno;
+
+	/********************* verificando tipo de desenho *********************/
+
+	if (!strcmp(desenho, "linha") || !strcmp(desenho, "line")){
+		retorno = removerLinha(dnum, imagem);
+	}
+
+	/* retangulos e poligonos gerais são alterados da mesma forma */
+	else if (!strcmp(desenho, "retangulo") || !strcmp(desenho, "rect") ||
+		!strcmp(desenho, "poligono") || !strcmp(desenho, "polygon")){
+		retorno = removerPoligono(dnum, imagem);
+	}
+
+	else if (!strcmp(desenho, "circulo") || !strcmp(desenho, "circle")){
+		retorno = removerCirculo(dnum, imagem);
+	}
+
+	else if (!strcmp(desenho, "preencher") || !strcmp(desenho, "fill")){
+		retorno = removerPreencher(dnum, imagem);
+	}
+
+	if (!retorno){
+		printf("Erro: o desenho selecionado nao existe\n");
+		return;
+	}
+
+	printf("Erro: o desenho selecionado nao existe\n");
 }

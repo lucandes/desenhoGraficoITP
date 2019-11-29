@@ -77,3 +77,91 @@ void inserirLinha(Linha linha, Imagem *imagem){
 		pintarPixel(x1, y1, imagem, linha.cor);
 	}
 }
+
+void editarLinha(int dnum, Imagem *imagem, int temArquivo, FILE *arqEspecificacao){
+	/* verifica se a linha existe */
+	if (dnum < 1 || dnum > imagem->desenho.numLinhas){
+		printf("Erro: o desenho selecionado nao existe\n");
+	}
+
+	/**** mesmo código de criar linha da função "executar" ****/
+	Ponto pontos[2];
+	lerPontos(pontos, 2, temArquivo, arqEspecificacao);
+
+	int valido;
+	valido = verificaCoordenadas(pontos[0].x, pontos[0].y, imagem) &&
+			 verificaCoordenadas(pontos[1].x, pontos[1].y, imagem);
+	if (!valido) return;
+	
+	Linha l;
+	l = criarLinha(pontos, imagem->cor, imagem);
+	/******************** fim do código ***********************/
+
+	/* substituindo linha na estrutura desenho */
+	imagem->desenho.linhas[dnum - 1] = l;
+}
+
+int moverLinha(int dnum, int dist[2], Imagem *imagem){
+	/* verifica se a linha existe */
+	if (dnum < 1 || dnum > imagem->desenho.numLinhas){
+		printf("Erro: o desenho selecionado nao existe\n");
+		return 0;
+	}
+
+	/* inserindo deslocamento na linha */
+	imagem->desenho.linhas[dnum - 1].inicio.x += dist[0];
+	imagem->desenho.linhas[dnum - 1].fim.x += dist[0];
+	imagem->desenho.linhas[dnum - 1].inicio.y += dist[1];
+	imagem->desenho.linhas[dnum - 1].fim.y += dist[1];
+
+	return 1;
+}
+
+int copiarLinha(int dnum, Imagem *imagem){
+	/* verifica se a linha existe */
+	if (dnum < 1 || dnum > imagem->desenho.numLinhas){
+		printf("Erro: o desenho selecionado nao existe\n");
+		return 0;
+	}
+
+	Linha new = imagem->desenho.linhas[dnum - 1];
+	int n = imagem->desenho.numLinhas++;
+	imagem->desenho.linhas[n] = new;
+
+	int numOrdem = imagem->desenho.numOrdem++;
+	imagem->desenho.ordem[numOrdem] = 1;
+
+	return 1;
+}
+
+int removerLinha(int dnum, Imagem *imagem){
+	Desenho *d = &imagem->desenho;
+
+	/* verifica se a linha existe */
+	if (dnum < 1 || dnum > imagem->desenho.numLinhas){
+		return 0;
+	}
+
+	/* movendo todas as linhas seguintes para a casa anterior */
+	for (int i = dnum; i < d->numLinhas; i++)
+		d->linhas[i - 1] = d->linhas[i];
+	d->numLinhas--;
+
+	int ord = 0; //contador
+	int ordIndex;
+
+	/* buscando a posição do desenho removido no vetor de ordem */
+	for (int i = 0; ord != dnum; ++i){
+		if (d->ordem[i] == 1) // representa linha
+			ord++;
+		if (ord == dnum)
+			ordIndex = i; // pegando a posição atual do desenho
+	}
+
+	/* movendo todas os desenhos seguintes para a casa anterior */
+	for (int i = ordIndex; i < d->numOrdem; i++)
+		d->ordem[i - 1] = d->ordem[i];
+	d->numOrdem--;
+
+	return 1;
+}

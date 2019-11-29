@@ -197,58 +197,6 @@ void limparImagem(Imagem *imagem, Cor cor, int imagemAberta, int temArquivo, FIL
 }
 
 /****************************************************
-Função: criarPreenchimento
-Parâmetros: ponto p, tipo Cor, ponteiro tipo Imagem
-Retorno: nenhum
-
-Descrição: armazena as informações sobre o preenchimento numa estrutura
-tipo Preencher e insere na estrutura de desenhos
-*****************************************************/
-Preencher criarPreenchimento(Ponto p, Cor novaCor, Imagem *imagem){
-	Preencher fill;
-	fill.novaCor = novaCor;
-
-	/* atribuindo coordenadas do pixel selecionado */
-	fill.ponto.x = p.x;
-	fill.ponto.y = p.y;
-
-	return fill;
-}
-
-/****************************************************
-Função: inserirPreenchimento
-Parâmetros: coordenadas do pixel, estrutura Preencher, ponteiro tipo Imagem
-Retorno: nenhum
-
-Descrição: altera os pixels de uma área de mesma cor. Funciona de maneira
-recursiva, verificando os pixels em 4 sentidos opostos a partir do pixel
-inicial. (ERRO DE SEGMENTAÇÃO EM ÁREAS EXTENSAS)
-*****************************************************/
-void inserirPreenchimento(int x, int y, Preencher p, Imagem *imagem){
-	/* se o pixel estiver fora das dimensões da imagem */
-	if (x > imagem->lar - 1 || x < 0 || y > imagem->alt - 1 || y < 0)
-		return;
-
-	Cor corAtual;
-	corAtual = imagem->pixelsCopy[y][x]; // cor do pixel atual
-
-	/* se a cor do pixel atual for diferente da cor do pixel pai (anterior) */
-	if (corAtual.r != p.cor.r || corAtual.g != p.cor.g || corAtual.b != p.cor.b)
-		return;
-
-	//printf("preenchendo (%d,%d)\n", x, y);
-	
-	/* pintando pixel com nova cor */
-	imagem->pixelsCopy[y][x] = p.novaCor;
-
-	/* chamada recursiva para os pixels vizinhos */
-	inserirPreenchimento(x+1, y, p, imagem);
-	inserirPreenchimento(x-1, y, p, imagem);
-	inserirPreenchimento(x, y+1, p, imagem);
-	inserirPreenchimento(x, y-1, p, imagem);
-}
-
-/****************************************************
 Função: criarDesenho
 Parâmetros: nenhum
 Retorno: estrutura Desenho
@@ -282,6 +230,7 @@ void listarDesenhos(Desenho d, int temArquivo){
 	/* listar linhas */
 	if (d.numLinhas)
 		printf("--------------LINHAS---------------\n");
+
 	for (int i = 0; i < d.numLinhas; ++i){
 		printf("- linha %02d - p1 (%d,%d), p2 (%d,%d)\n", 
 			i+1, 
@@ -295,6 +244,7 @@ void listarDesenhos(Desenho d, int temArquivo){
 	/* listar poligonos */
 	if (d.numPoligonos)
 		printf("-------------POLIGONOS-------------\n");
+
 	for (int i = 0; i < d.numPoligonos; ++i){
 		printf("- poligono %02d -", i+1);
 		
@@ -311,18 +261,20 @@ void listarDesenhos(Desenho d, int temArquivo){
 	/* listar circulos */
 	if (d.numCirculos)
 		printf("-------------CIRCULOS--------------\n");
+
 	for (int i = 0; i < d.numCirculos; ++i){
-		printf("- circulo %02d - raio: %d, centro: (%d,%d)\n", 
+		printf("- circulo %02d - centro: (%d,%d) raio: %d\n", 
 			i+1,
-			d.circulos[i].raio,
 			d.circulos[i].centro.x,
-			d.circulos[i].centro.y);
+			d.circulos[i].centro.y,
+			d.circulos[i].raio);
 		count++;
 	}
 
 	/* listar preenchimentos */
 	if (d.numPreencher)
 		printf("-------------PREENCHER-------------\n");
+
 	for (int i = 0; i < d.numPreencher; ++i){
 		printf("- preencher %02d - ponto: (%d,%d) cor (%d, %d, %d)\n", 
 			i+1,
@@ -334,10 +286,11 @@ void listarDesenhos(Desenho d, int temArquivo){
 		count++;
 	}
 
-	if (!count)
+	if (!count){
 		printf("A imagem atual nao possui desenhos\n\n");
-	else
-		printf("-----------------------------------\n\n");
+		return;
+	}
+	printf("-----------------------------------\n\n");
 }
 
 /****************************************************

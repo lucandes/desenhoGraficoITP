@@ -70,17 +70,7 @@ int main(){
 				liberarAD(&imagem, imagem.pixelsCopy);
 			}
 
-			/* leitura do caminho do arquivo */
-			if (!temArquivo){
-				getc(stdin); // pegando o espaço entre o comando e o nome do arquivo
-				fgets(imagem.caminho, 100, stdin);
-				imagem.caminho[strlen(imagem.caminho) - 1] = '\0';
-			}
-			else {
-				fgets(imagem.caminho, 100, arqEspecificacao);
-				imagem.caminho[strlen(imagem.caminho) - 1] = '\0';
-				printf(" %s\n", imagem.caminho);
-			}
+			lerString(imagem.caminho, 100, temArquivo, arqEspecificacao);
 
 			imagem = abrirImagem(&imagemAberta, imagem.caminho);
 			autosave = 0;
@@ -109,9 +99,7 @@ int main(){
 
 		else if (!strcmp(entrada, "ler") || !strcmp(entrada, "read")){
 			/* leitura do caminho do arquivo de especificação */
-			getc(stdin); // pegando o espaço entre o comando e o nome do arquivo
-			fgets(imagem.caminho, 100, stdin);
-			imagem.caminho[ strlen(imagem.caminho) - 1 ] = '\0'; // removendo o '\n' do final da string
+			scanf("%s", imagem.caminho);
 
 			arqEspecificacao = novoArquivo(&temArquivo, imagem);
 			autosave = 0;

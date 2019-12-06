@@ -17,5 +17,6 @@ void limpaConsole(void);
 FILE *novoArquivo(int *temArquivo, Imagem imagem);
 int lerArquivo(FILE *arquivo, char *entrada);
 int verificaCoordenadas(int x, int y, Imagem *imagem);
+int compararCor(Cor cor1, Cor cor2);
 
 #endif

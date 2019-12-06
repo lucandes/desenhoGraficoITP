@@ -30,8 +30,9 @@ void printAjuda(int temArquivo){
 	printf("\n---------COMANDOS  EXTRA----------\n");
 	printf("autosave <nome_do_arquivo>          (habilita o salvamento automatico da imagem)\n");
 	printf("editar <desenho> <id> <nova_config> (permite redefinir as configuracoes do desenho)\n");
-	printf("mover <desenho> <id> <distX> <distY>(permite mover o desenho de posicao)\n");
-	printf("remover <desenho> <id>              (remove o desenho da imagem)\n");
+	printf("mover <desenho> <id> <distX> <distY>(permite mover um desenho de posicao)\n");
+	printf("copiar <desenho> <id>               (copia um desenho da imagem)\n");
+	printf("remover <desenho> <id>              (remove um desenho da imagem)\n");
 	printf("\n");
 }
 
@@ -120,29 +121,26 @@ acabou, 0 se ainda possui conteúdo e -1 se for um comentário (#).
 int lerArquivo(FILE *arquivo, char *entrada){
 	char c = 'a'; // iniciado com char genérico
 	int i = 0; // contador
+	int ret = 0;
 
-	while (c != ' ' && c != '\n'){
+	do {
 		c = getc(arquivo);
-
-		/* verificando se é um comentário */
-		if (c == '#'){
-			limparBuffer(1, arquivo);
-			return -1; // retorno de comentario
-		}
-
-		/* caso seja espaço, encerre a string */
-		if (c == ' ' || c == '\n')
-			entrada[i++] = '\0';
-		else
-			entrada[i++] = c;
 
 		/* verificando se chegou ao fim do arquivo*/
 		if (feof(arquivo))
-			return 1; // retorno de fim de arquivo
-	}
+			return 1;
+
+		/* caso seja espaço, encerre a string */
+		if (c == ' ' || c == '\n'){
+			entrada[i++] = '\0';
+			return 0;
+		}
+		else
+			entrada[i++] = c;
+	}while (c != ' ' && c != '\n');
+	
 	return 0;
 }
-
 /****************************************************
 Função: verificaCoordenadas
 Parâmetros: inteiro x, inteiro y, ponteiro de imagem
@@ -156,9 +154,17 @@ int verificaCoordenadas(int x, int y, Imagem *imagem){
 	int maxY = imagem->alt - 1;
 
 	if (x > maxX || x < 0 || y > maxY || y < 0){
-		printf("Erro: coordenada invalida inserida\n");
+		//printf("Erro: coordenada invalida inserida\n");
 		return 0;
 	}
 
 	return 1;
+}
+
+int compararCor(Cor cor1, Cor cor2){
+	if (cor1.r == cor2.r &&
+		cor1.g == cor2.g &&
+		cor1.b == cor2.b)
+		return 1;
+	return 0;
 }

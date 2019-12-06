@@ -5,6 +5,8 @@
 #include "linha.h"
 
 Poligono criarPoligono(int numFaces, Ponto *pontos, Imagem *imagem);
+void lerRetangulo(int temArquivo, FILE *arqEspecificacao, Imagem *imagem);
+void lerPoligono(int temArquivo, FILE *arqEspecificacao, Imagem *imagem);
 void inserirPoligono(Poligono pol, Imagem *imagem);
 void gerarPontosRet(Ponto pontoInicial, Ponto pontos[4], int dim[2]);
 void editarRetangulo(int dnum, Imagem *imagem, int temArquivo, FILE *arqEspecificacao);

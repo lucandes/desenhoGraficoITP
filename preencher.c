@@ -19,6 +19,25 @@ Preencher criarPreenchimento(Ponto p, Cor novaCor, Imagem *imagem){
 	return fill;
 }
 
+void lerPreencher(int temArquivo, FILE *arqEspecificacao, Imagem *imagem){
+	Ponto p;
+	lerPontos(&p, 1, temArquivo, arqEspecificacao);
+
+	Cor novaCor;
+	novaCor = criarCor(temArquivo, arqEspecificacao);
+	limparBuffer(temArquivo, arqEspecificacao);
+
+	Preencher fill = criarPreenchimento(p, novaCor, imagem);
+
+	/* inserindo preenchimento na estrutura de desenho */
+	int n = imagem->desenho.numPreencher++;
+	imagem->desenho.preencher[n] = fill;
+
+	/* adicionando o preenchimento à ordem */
+	int i = imagem->desenho.numOrdem++;
+	imagem->desenho.ordem[i] = 4; // 4 representa preencher
+}
+
 /****************************************************
 Função: inserirPreenchimento
 Parâmetros: coordenadas do pixel, estrutura Preencher, ponteiro tipo Imagem
@@ -59,13 +78,11 @@ void editarPreencher(int dnum, Imagem *imagem, int temArquivo, FILE *arqEspecifi
 		return;
 	}
 
-	/**** mesmo código de criar linha da função "executar" ****/
 	Ponto p;
 	lerPontos(&p, 1, temArquivo, arqEspecificacao);
 
 	Cor novaCor;
 	novaCor = criarCor(temArquivo, arqEspecificacao);
-	/******************** fim do código ***********************/
 
 	Preencher fill = criarPreenchimento(p, novaCor, imagem);
 	imagem->desenho.preencher[dnum - 1] = fill;
@@ -108,25 +125,31 @@ int removerPreencher(int dnum, Imagem *imagem){
 		return 0;
 	}
 
-	/* movendo todos os preenchimentos eguintes para a casa anterior */
-	for (int i = dnum; i < d->numPreencher; i++)
-		d->preencher[i - 1] = d->preencher[i];
+	/* movendo todos os preenchimentos seguintes para a casa anterior */
+	for (int i = dnum - 1; i < d->numPreencher; i++)
+		d->preencher[i] = d->preencher[i + 1];
 	d->numPreencher--;
 
 	int ord = 0; //contador
 	int ordIndex;
 
 	/* buscando a posição do desenho removido no vetor de ordem */
-	for (int i = 0; ord != dnum; ++i){
-		if (d->ordem[i] == 1) // representa preencher
+	for (int i = 0; i < d->numOrdem; ++i){
+		if (d->ordem[i] == 4){ // representa preencher
 			ord++;
-		if (ord == dnum)
-			ordIndex = i; // pegando a posição atual do desenho
+
+			if (ord == dnum){
+				ordIndex = i; // pegando a posição atual do desenho
+				break;
+			}
+		}
+
 	}
 
 	/* movendo todas os desenhos seguintes para a casa anterior */
-	for (int i = ordIndex; i < d->numOrdem; i++)
-		d->ordem[i - 1] = d->ordem[i];
+	for (int i = ordIndex; i < d->numOrdem; i++){
+		d->ordem[i] = d->ordem[i + 1];
+	}
 	d->numOrdem--;
 
 	return 1;

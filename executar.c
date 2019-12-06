@@ -18,129 +18,40 @@ void executar(char entrada[10], int *autosave, Imagem *imagem, int imagemAberta,
 	if (!strcmp(entrada, "limpar") || !strcmp(entrada, "clear")){
 		Cor cor = criarCor(temArquivo, arqEspecificacao);
 		limparBuffer(temArquivo, arqEspecificacao);
-
-		limparImagem(imagem, cor, imagemAberta, temArquivo, arqEspecificacao);
+		limparImagem(imagem, cor);
 	}
 
 	/* comando linha */
 	else if (!strcmp(entrada, "linha") || !strcmp(entrada, "line")){
-		Ponto pontos[2];
-		lerPontos(pontos, 2, temArquivo, arqEspecificacao);
-		limparBuffer(temArquivo, arqEspecificacao);
-
-		/* verifica se as entradas são válidas */
-		int valido;
-		valido = verificaCoordenadas(pontos[0].x, pontos[0].y, imagem) &&
-				 verificaCoordenadas(pontos[1].x, pontos[1].y, imagem);
-		if (!valido)
-			return;
-		
-		Linha l;
-		l = criarLinha(pontos, imagem->cor, imagem);
-
-		/* adicionando linha à estrutura linha */
-		int n = imagem->desenho.numLinhas++;
-		imagem->desenho.linhas[n] = l;
-
-		/* adicionando a linha à ordem */
-		int i = imagem->desenho.numOrdem++;
-		imagem->desenho.ordem[i] = 1; // 1 representa linhas
+		lerLinha(temArquivo, arqEspecificacao, imagem);
 	}
 
 	/* comando retangulo */
 	else if (!strcmp(entrada, "retangulo") || !strcmp(entrada, "rect")){
-		/* leitura do ponto inicial e das dimensões */
-		Ponto pontoInicial;
-		lerPontos(&pontoInicial, 1, temArquivo, arqEspecificacao);
-		int dimensoes[2];
-		lerInteiros(dimensoes, 2, temArquivo, arqEspecificacao);
-		limparBuffer(temArquivo, arqEspecificacao);
-
-		/* definindo coordenadas dos pontos a partir das dimensões */
-		int numFaces = 4;
-		Ponto pontos[numFaces];
-		gerarPontosRet(pontoInicial, pontos, dimensoes);
-		
-		Poligono pol = criarPoligono(numFaces, pontos, imagem);
-
-		int n = imagem->desenho.numPoligonos++;
-		imagem->desenho.poligonos[n] = pol;
-
-		/* adicionando o poligono à ordem */
-		int m = imagem->desenho.numOrdem++;
-		imagem->desenho.ordem[m] = 2; // 2 representa poligonos
+		lerRetangulo(temArquivo, arqEspecificacao, imagem);
 	}
 
 	/* comando poligono */
 	else if (!strcmp(entrada, "poligono") || !strcmp(entrada, "polygon")){
-		int numFaces; 
-		lerInteiros(&numFaces, 1, temArquivo, arqEspecificacao);
-
-		/* verificando se o número de faces é válido */
-		if (numFaces < 3 || numFaces > 100){
-			printf("Erro: numero inválido de faces inserido\n");
-			limparBuffer(temArquivo, arqEspecificacao);
-			return;
-		}
-
-		Ponto pontos[numFaces];
-		lerPontos(pontos, numFaces, temArquivo, arqEspecificacao);
-		limparBuffer(temArquivo, arqEspecificacao);
-
-		Poligono pol = criarPoligono(numFaces, pontos, imagem);
-
-		int n = imagem->desenho.numPoligonos++;
-		imagem->desenho.poligonos[n] = pol;
-
-		/* adicionando o poligono à ordem */
-		int m = imagem->desenho.numOrdem++;
-		imagem->desenho.ordem[m] = 2; // 2 representa poligonos
+		lerPoligono(temArquivo, arqEspecificacao, imagem);
 	}
 
 	/* comando circulo */
 	else if (!strcmp(entrada, "circulo") || !strcmp(entrada, "circle")){
-		Ponto centro;
-		lerPontos(&centro, 1, temArquivo, arqEspecificacao);
-
-		int raio;
-		lerInteiros(&raio, 1, temArquivo, arqEspecificacao);
-		limparBuffer(temArquivo, arqEspecificacao);
-
-		Circulo c = criarCirculo(centro, raio, imagem->cor, imagem);
-
-		/* adicionando aos desenhos da imagem */
-		int n = imagem->desenho.numCirculos++;
-		imagem->desenho.circulos[n] = c;
-
-		/* adicionando o circulo a ordem */
-		int i = imagem->desenho.numOrdem++;
-		imagem->desenho.ordem[i] = 3; // 3 representa círculos
+		lerCirculo(temArquivo, arqEspecificacao, imagem);
 	}
 
 	/* comando preencher */
 	else if (!strcmp(entrada, "preencher") || !strcmp(entrada, "fill")){
-		Ponto p;
-		lerPontos(&p, 1, temArquivo, arqEspecificacao);
-
-		Cor novaCor;
-		novaCor = criarCor(temArquivo, arqEspecificacao);
-		limparBuffer(temArquivo, arqEspecificacao);
-
-		Preencher fill = criarPreenchimento(p, novaCor, imagem);
-
-		/* inserindo preenchimento na estrutura de desenho */
-		int n = imagem->desenho.numPreencher++;
-		imagem->desenho.preencher[n] = fill;
-
-		/* adicionando o preenchimento à ordem */
-		int i = imagem->desenho.numOrdem++;
-		imagem->desenho.ordem[i] = 4; // 4 representa preencher
+		lerPreencher(temArquivo, arqEspecificacao, imagem);
 	}
 
 	/* comando salvar */
 	else if (!strcmp(entrada, "salvar") || !strcmp(entrada, "save")){
-		if (!*autosave)
+		if (!*autosave){
 			lerString(imagem->nomeDoArquivo, 100, temArquivo, arqEspecificacao);
+			limparBuffer(temArquivo, arqEspecificacao);
+		}
 		salvarImagem(imagem);
 		printf("imagem salva em './galeria/%s'\n", imagem->nomeDoArquivo);
 	}
@@ -287,19 +198,23 @@ void mover(char desenho[15], int dnum, int dist[2], int temArquivo, FILE *arqEsp
 
 	if (!strcmp(desenho, "linha") || !strcmp(desenho, "line")){
 		retorno = moverLinha(dnum, dist, imagem);
+		return;
 	}
 	/* retangulos e poligonos gerais são alterados da mesma forma */
 	else if (!strcmp(desenho, "retangulo") || !strcmp(desenho, "rect") ||
 		!strcmp(desenho, "poligono") || !strcmp(desenho, "polygon")){
 		retorno = moverPoligono(dnum, dist, imagem);
+		return;
 	}
 
 	else if (!strcmp(desenho, "circulo") || !strcmp(desenho, "circle")){
 		retorno = moverCirculo(dnum, dist, imagem);
+		return;
 	}
 
 	else if (!strcmp(desenho, "preencher") || !strcmp(desenho, "fill")){
 		retorno = moverPreencher(dnum, dist, imagem);
+		return;
 	}
 
 	if (!retorno){
@@ -323,19 +238,23 @@ void copiar(char desenho[15], int dnum, int temArquivo, FILE *arqEspecificacao, 
 
 	if (!strcmp(desenho, "linha") || !strcmp(desenho, "line")){
 		retorno = copiarLinha(dnum, imagem);
+		return;
 	}
 	/* retangulos e poligonos gerais são alterados da mesma forma */
 	else if (!strcmp(desenho, "retangulo") || !strcmp(desenho, "rect") ||
 		!strcmp(desenho, "poligono") || !strcmp(desenho, "polygon")){
 		retorno = copiarPoligono(dnum, imagem);
+		return;
 	}
 
 	else if (!strcmp(desenho, "circulo") || !strcmp(desenho, "circle")){
 		retorno = copiarCirculo(dnum, imagem);
+		return;
 	}
 
 	else if (!strcmp(desenho, "preencher") || !strcmp(desenho, "fill")){
 		retorno = copiarPreencher(dnum, imagem);
+		return;
 	}
 
 	if (!retorno){
@@ -350,7 +269,6 @@ void remover(char desenho[15], int dnum, int temArquivo, FILE *arqEspecificacao,
 	/* verificando se existem desenhos para mover */
 	if (imagem->desenho.numOrdem == 0){
 		printf("Erro: a imagem nao possui desenhos\n");
-		limparBuffer(temArquivo, arqEspecificacao);
 		return;
 	}
 
@@ -360,20 +278,24 @@ void remover(char desenho[15], int dnum, int temArquivo, FILE *arqEspecificacao,
 
 	if (!strcmp(desenho, "linha") || !strcmp(desenho, "line")){
 		retorno = removerLinha(dnum, imagem);
+		return;
 	}
 
 	/* retangulos e poligonos gerais são alterados da mesma forma */
 	else if (!strcmp(desenho, "retangulo") || !strcmp(desenho, "rect") ||
 		!strcmp(desenho, "poligono") || !strcmp(desenho, "polygon")){
 		retorno = removerPoligono(dnum, imagem);
+		return;
 	}
 
 	else if (!strcmp(desenho, "circulo") || !strcmp(desenho, "circle")){
 		retorno = removerCirculo(dnum, imagem);
+		return;
 	}
 
 	else if (!strcmp(desenho, "preencher") || !strcmp(desenho, "fill")){
 		retorno = removerPreencher(dnum, imagem);
+		return;
 	}
 
 	if (!retorno){

@@ -16,6 +16,25 @@ Circulo criarCirculo(Ponto centro, int raio, Cor cor, Imagem *imagem){
 	return c;
 }
 
+void lerCirculo(int temArquivo, FILE *arqEspecificacao, Imagem *imagem){
+	Ponto centro;
+	lerPontos(&centro, 1, temArquivo, arqEspecificacao);
+
+	int raio;
+	lerInteiros(&raio, 1, temArquivo, arqEspecificacao);
+	limparBuffer(temArquivo, arqEspecificacao);
+
+	Circulo c = criarCirculo(centro, raio, imagem->cor, imagem);
+
+	/* adicionando aos desenhos da imagem */
+	int n = imagem->desenho.numCirculos++;
+	imagem->desenho.circulos[n] = c;
+
+	/* adicionando o circulo a ordem */
+	int i = imagem->desenho.numOrdem++;
+	imagem->desenho.ordem[i] = 3; // 3 representa círculos
+}
+
 /****************************************************
 Função: inserirPonto
 Parâmetros: tipo Circulo, inteiro x, inteiro y, ponteiro tipo Imagem, tipo Cor
@@ -137,16 +156,21 @@ int removerCirculo(int dnum, Imagem *imagem){
 	int ordIndex;
 
 	/* buscando a posição do desenho removido no vetor de ordem */
-	for (int i = 0; ord != dnum; ++i){
-		if (d->ordem[i] == 1) // representa circulo
+	for (int i = 0; i < d->numOrdem; ++i){
+		if (d->ordem[i] == 3){ // representa circulo
 			ord++;
-		if (ord == dnum)
-			ordIndex = i; // pegando a posição atual do desenho
+
+			if (ord == dnum){
+				ordIndex = i; // pegando a posição atual do desenho
+				break;
+			}
+		}
 	}
 
 	/* movendo todas os desenhos seguintes para a casa anterior */
-	for (int i = ordIndex; i < d->numOrdem; i++)
-		d->ordem[i - 1] = d->ordem[i];
+	for (int i = ordIndex; i < d->numOrdem; i++){
+		d->ordem[i] = d->ordem[i + 1];
+	}
 	d->numOrdem--;
 
 	return 1;

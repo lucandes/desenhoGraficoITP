@@ -2,8 +2,10 @@
 #define CIRCULO_H
 
 #include "struct.h"
+#include "func.h"
 
 Circulo criarCirculo(Ponto centro, int raio, Cor cor, Imagem *imagem);
+void lerCirculo(int temArquivo, FILE *arqEspecificacao, Imagem *imagem);
 void plot_point(Circulo c, int x, int y, Imagem *imagem, Cor cor);
 void inserirCirculo(Circulo c, Imagem *imagem);
 void editarCirculo(int dnum, Imagem *imagem, int temArquivo, FILE *arqEspecificacao);

@@ -23,6 +23,30 @@ Linha criarLinha(Ponto pontos[2], Cor cor, Imagem *imagem){
 	return linha;
 }	
 
+void lerLinha(int temArquivo, FILE *arqEspecificacao, Imagem *imagem){
+	Ponto pontos[2];
+	lerPontos(pontos, 2, temArquivo, arqEspecificacao);
+	limparBuffer(temArquivo, arqEspecificacao);
+
+	/* verifica se as entradas são válidas */
+	int valido;
+	valido = verificaCoordenadas(pontos[0].x, pontos[0].y, imagem) &&
+			 verificaCoordenadas(pontos[1].x, pontos[1].y, imagem);
+	if (!valido)
+		return;
+	
+	Linha l;
+	l = criarLinha(pontos, imagem->cor, imagem);
+
+	/* adicionando linha à estrutura linha */
+	int n = imagem->desenho.numLinhas++;
+	imagem->desenho.linhas[n] = l;
+
+	/* adicionando a linha à ordem */
+	int i = imagem->desenho.numOrdem++;
+	imagem->desenho.ordem[i] = 1; // 1 representa linhas
+}
+
 /****************************************************
 Função: inserirLinha
 Parâmetros: tipo Linha, ponteiro tipo Imagem
@@ -151,16 +175,22 @@ int removerLinha(int dnum, Imagem *imagem){
 	int ordIndex;
 
 	/* buscando a posição do desenho removido no vetor de ordem */
-	for (int i = 0; ord != dnum; ++i){
-		if (d->ordem[i] == 1) // representa linha
+	for (int i = 0; i < d->numOrdem; ++i){
+		if (d->ordem[i] == 1){ // representa linha
 			ord++;
-		if (ord == dnum)
-			ordIndex = i; // pegando a posição atual do desenho
+
+			if (ord == dnum){
+				ordIndex = i; // pegando a posição atual do desenho
+				break;
+			}
+		}
+
 	}
 
 	/* movendo todas os desenhos seguintes para a casa anterior */
-	for (int i = ordIndex; i < d->numOrdem; i++)
-		d->ordem[i - 1] = d->ordem[i];
+	for (int i = ordIndex; i < d->numOrdem; i++){
+		d->ordem[i] = d->ordem[i + 1];
+	}
 	d->numOrdem--;
 
 	return 1;

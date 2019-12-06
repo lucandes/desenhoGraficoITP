@@ -20,6 +20,54 @@ Poligono criarPoligono(int numFaces, Ponto *pontos, Imagem *imagem){
 	return pol;
 }
 
+void lerRetangulo(int temArquivo, FILE *arqEspecificacao, Imagem *imagem){
+	/* leitura do ponto inicial e das dimensões */
+	Ponto pontoInicial;
+	lerPontos(&pontoInicial, 1, temArquivo, arqEspecificacao);
+	int dimensoes[2];
+	lerInteiros(dimensoes, 2, temArquivo, arqEspecificacao);
+	limparBuffer(temArquivo, arqEspecificacao);
+
+	/* definindo coordenadas dos pontos a partir das dimensões */
+	int numFaces = 4;
+	Ponto pontos[numFaces];
+	gerarPontosRet(pontoInicial, pontos, dimensoes);
+	
+	Poligono pol = criarPoligono(numFaces, pontos, imagem);
+
+	int n = imagem->desenho.numPoligonos++;
+	imagem->desenho.poligonos[n] = pol;
+
+	/* adicionando o poligono à ordem */
+	int m = imagem->desenho.numOrdem++;
+	imagem->desenho.ordem[m] = 2; // 2 representa poligonos
+}
+
+void lerPoligono(int temArquivo, FILE *arqEspecificacao, Imagem *imagem){
+	int numFaces; 
+	lerInteiros(&numFaces, 1, temArquivo, arqEspecificacao);
+
+	/* verificando se o número de faces é válido */
+	if (numFaces < 3 || numFaces > 100){
+		printf("Erro: numero inválido de faces inserido\n");
+		limparBuffer(temArquivo, arqEspecificacao);
+		return;
+	}
+
+	Ponto pontos[numFaces];
+	lerPontos(pontos, numFaces, temArquivo, arqEspecificacao);
+	limparBuffer(temArquivo, arqEspecificacao);
+
+	Poligono pol = criarPoligono(numFaces, pontos, imagem);
+
+	int n = imagem->desenho.numPoligonos++;
+	imagem->desenho.poligonos[n] = pol;
+
+	/* adicionando o poligono à ordem */
+	int m = imagem->desenho.numOrdem++;
+	imagem->desenho.ordem[m] = 2; // 2 representa poligonos
+}
+
 /****************************************************
 Função: inserirPoligono
 Parâmetros: tipo Poligono, Tipo imagem
@@ -176,16 +224,22 @@ int removerPoligono(int dnum, Imagem *imagem){
 	int ordIndex;
 
 	/* buscando a posição do desenho removido no vetor de ordem */
-	for (int i = 0; ord != dnum; ++i){
-		if (d->ordem[i] == 2) // representa poligono
+	for (int i = 0; i < d->numOrdem; ++i){
+		if (d->ordem[i] == 2){ // representa poligono
 			ord++;
-		if (ord == dnum)
-			ordIndex = i; // pegando a posição atual do desenho
-	}
 
+			if (ord == dnum){
+				ordIndex = i; // pegando a posição atual do desenho
+				break;
+			}
+		}
+
+	}
+	
 	/* movendo todas os desenhos seguintes para a casa anterior */
-	for (int i = ordIndex; i < d->numOrdem; i++)
-		d->ordem[i - 1] = d->ordem[i];
+	for (int i = ordIndex; i < d->numOrdem; i++){
+		d->ordem[i] = d->ordem[i + 1];
+	}
 	d->numOrdem--;
 
 	return 1;

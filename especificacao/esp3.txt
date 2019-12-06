@@ -1,0 +1,11 @@
+imagem 300 300
+preencher 200 80 200 50 50
+preencher 0 0 0 0 50
+cor 255 255 255
+line 0 255 255 30
+circulo 255 30 70
+copiar circulo 1
+mover circulo 2 -100 20
+preencher 200 80 200 0 0
+preencher 299 299 0 0 150
+salvar img.ppm

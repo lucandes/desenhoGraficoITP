@@ -96,10 +96,11 @@ por parâmetro, se houver um arquivo de especificação a
 leitura será realizada nesse arquivo.
 *****************************************************/
 void lerString(char *string, int tamStr, int temArquivo, FILE *arq){
-	if (!temArquivo)
-			scanf("%s", string);
-		else {
-			fscanf(arq, "%s", string);
-			printf(" %s", string);
-		}
+	if (!temArquivo){
+		scanf("%s", string);
+		return;
+	}
+
+	fscanf(arq, "%s", string);
+	printf(" %s", string);
 }

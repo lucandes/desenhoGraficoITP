@@ -2,8 +2,10 @@
 #define PREENCHER_H
 
 #include "struct.h"
+#include "func.h"
 
 Preencher criarPreenchimento(Ponto p, Cor novaCor, Imagem *imagem);
+void lerPreencher(int temArquivo, FILE *arqEspecificacao, Imagem *imagem);
 void inserirPreenchimento(int x, int y, Preencher p, Imagem *imagem);
 void editarPreencher(int dnum, Imagem *imagem, int temArquivo, FILE *arqEspecificacao);
 int moverPreencher(int dnum, int dist[2], Imagem *imagem);

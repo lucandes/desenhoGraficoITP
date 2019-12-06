@@ -184,7 +184,7 @@ Retorno: nenhum
 
 Descrição: limpa toda a imagem para uma cor especificada
 *****************************************************/
-void limparImagem(Imagem *imagem, Cor cor, int imagemAberta, int temArquivo, FILE *arqEspecificacao){
+void limparImagem(Imagem *imagem, Cor cor){
 	for (int i = 0; i < imagem->alt; ++i)
 		for (int j = 0; j < imagem->lar; ++j){
 			imagem->pixels[i][j].r = cor.r;
@@ -226,71 +226,61 @@ void listarDesenhos(Desenho d, int temArquivo){
 	if (temArquivo)
 			printf("\n"); // quebra de linha final
 
-	int count = 0;
-	/* listar linhas */
-	if (d.numLinhas)
-		printf("--------------LINHAS---------------\n");
+	int printed; //counters
+	int lin = 0;
+	int pol = 0;
+	int cir = 0;
+	int pre = 0;
 
-	for (int i = 0; i < d.numLinhas; ++i){
-		printf("- linha %02d - p1 (%d,%d), p2 (%d,%d)\n", 
-			i+1, 
-			d.linhas[i].inicio.x,
-			d.linhas[i].inicio.y,
-			d.linhas[i].fim.x,
-			d.linhas[i].fim.y);
-		count++;
-	}
+	printf("--------------------------------------------\n");
+	for (printed = 0; printed < d.numOrdem;){
+		switch(d.ordem[printed]){
+			case 1:
+				printf("%02d - linha %d - p1 (%d,%d), p2 (%d,%d)\n", ++printed, lin + 1, 
+					d.linhas[lin].inicio.x,
+					d.linhas[lin].inicio.y,
+					d.linhas[lin].fim.x,
+					d.linhas[lin].fim.y);
+				lin++;
+				break;
 
-	/* listar poligonos */
-	if (d.numPoligonos)
-		printf("-------------POLIGONOS-------------\n");
+			case 2:
+				printf("%02d- poligono %d -", printed++, pol + 1);
+				for (int j = 0; j < d.poligonos[pol].numFaces; ++j){
+					printf(" p%d (%d,%d)", j+1,
+						d.poligonos[pol].pontos[j].x,
+						d.poligonos[pol].pontos[j].y);
+				}
+				pol++;
+				printf("\n");
+				break;
 
-	for (int i = 0; i < d.numPoligonos; ++i){
-		printf("- poligono %02d -", i+1);
-		
-		for (int j = 0; j < d.poligonos[i].numFaces; ++j){
-			printf(" p%d (%d,%d)", 
-				j+1,
-				d.poligonos[i].pontos[j].x,
-				d.poligonos[i].pontos[j].y);
+			case 3:
+				printf("%02d - circulo %d - centro: (%d,%d) raio: %d\n", ++printed, cir + 1,
+					d.circulos[cir].centro.x,
+					d.circulos[cir].centro.y,
+					d.circulos[cir].raio);
+				cir++;
+				break;
+
+			case 4:
+				printf("%02d - preencher %d - ponto: (%d,%d) cor (%d, %d, %d)\n", ++printed, pre + 1,
+					d.preencher[pre].ponto.x,
+					d.preencher[pre].ponto.y,
+					d.preencher[pre].novaCor.r,
+					d.preencher[pre].novaCor.g,
+					d.preencher[pre].novaCor.b);
+				pre++;
+				break;
+
 		}
-		printf("\n");
-		count++;
 	}
 
-	/* listar circulos */
-	if (d.numCirculos)
-		printf("-------------CIRCULOS--------------\n");
-
-	for (int i = 0; i < d.numCirculos; ++i){
-		printf("- circulo %02d - centro: (%d,%d) raio: %d\n", 
-			i+1,
-			d.circulos[i].centro.x,
-			d.circulos[i].centro.y,
-			d.circulos[i].raio);
-		count++;
-	}
-
-	/* listar preenchimentos */
-	if (d.numPreencher)
-		printf("-------------PREENCHER-------------\n");
-
-	for (int i = 0; i < d.numPreencher; ++i){
-		printf("- preencher %02d - ponto: (%d,%d) cor (%d, %d, %d)\n", 
-			i+1,
-			d.preencher[i].ponto.x,
-			d.preencher[i].ponto.y,
-			d.preencher[i].novaCor.r,
-			d.preencher[i].novaCor.g,
-			d.preencher[i].novaCor.b);
-		count++;
-	}
-
-	if (!count){
+	if (!d.numOrdem){
 		printf("A imagem atual nao possui desenhos\n\n");
 		return;
 	}
-	printf("-----------------------------------\n\n");
+	printf("--------------------------------------------\n\n");
 }
 
 /****************************************************
@@ -327,6 +317,14 @@ void inserirDesenhos(Imagem *imagem){
 		else if (d == 4){
 			Preencher p = imagem->desenho.preencher[pre++];
 			p.cor = imagem->pixelsCopy[p.ponto.y][p.ponto.x]; // definindo cor do pixel inicial
+
+			/* caso a cor a ser pintada seja igual a atual*/
+			if (compararCor(p.cor, p.novaCor)){
+				p.novaCor.r++; // alterando a nova cor
+				inserirPreenchimento(p.ponto.x, p.ponto.y, p, imagem);
+				p.novaCor.r--; // revertendo a cor
+			}
+
 			inserirPreenchimento(p.ponto.x, p.ponto.y, p, imagem);
 		}
 	}

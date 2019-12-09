@@ -16,6 +16,14 @@ Circulo criarCirculo(Ponto centro, int raio, Cor cor, Imagem *imagem){
 	return c;
 }
 
+/****************************************************
+Função: lerCirculo
+Parâmetros: inteiro temArquivo, arquivo de especificação, ponteiro tipo Imagem
+Retorno: nenhum
+
+Descrição: faz a leitura dos paramêtros necessários para a criação
+de um novo desenho na imagem, chama a função de criação
+*****************************************************/
 void lerCirculo(int temArquivo, FILE *arqEspecificacao, Imagem *imagem){
 	Ponto centro;
 	lerPontos(&centro, 1, temArquivo, arqEspecificacao);
@@ -36,7 +44,7 @@ void lerCirculo(int temArquivo, FILE *arqEspecificacao, Imagem *imagem){
 }
 
 /****************************************************
-Função: inserirPonto
+Função: inserir
 Parâmetros: tipo Circulo, inteiro x, inteiro y, ponteiro tipo Imagem, tipo Cor
 Retorno: nenhum
 
@@ -63,7 +71,7 @@ Função: inserirCirculo
 Parâmetros: tipo Circulo, ponteiro tipo Imagem
 Retorno: nenhum
 
-Descrição: insere um circulo na matriz de pixels da imagem
+Descrição: insere um circulo na matriz de pixels da imagem.
 *****************************************************/
 void inserirCirculo(Circulo circ, Imagem *imagem){
 	int x = 0;
@@ -89,6 +97,14 @@ void inserirCirculo(Circulo circ, Imagem *imagem){
 	}
 }
 
+/****************************************************
+Função: editarCirculo
+Parâmetros: numero do desenho, ponteiro tipo Imagem, inteiro temArquivo, arquivo de especificação
+Retorno: nenhum
+
+Descrição: permite que o usuário reescreva as informações de
+um determinado desenho.
+*****************************************************/
 void editarCirculo(int dnum, Imagem *imagem, int temArquivo, FILE *arqEspecificacao){
 	/* verifica se o círculo existe */
 	if (dnum < 1 || dnum > imagem->desenho.numCirculos){
@@ -107,6 +123,13 @@ void editarCirculo(int dnum, Imagem *imagem, int temArquivo, FILE *arqEspecifica
 	imagem->desenho.circulos[dnum - 1] = c;
 }
 
+/****************************************************
+Função: moverCirculo
+Parâmetros: numero do desenho, vetor distancia do deslocamento, ponteiro tipo Imagem,
+Retorno: nenhum
+
+Descrição: permite que o usuário mova um determinado desenho.
+*****************************************************/
 int moverCirculo(int dnum, int dist[2], Imagem *imagem){
 	/* verifica se o círculo existe */
 	if (dnum < 1 || dnum > imagem->desenho.numCirculos){
@@ -121,6 +144,13 @@ int moverCirculo(int dnum, int dist[2], Imagem *imagem){
 	return 1;
 }
 
+/****************************************************
+Função: copiarCirculo
+Parâmetros: numero do desenho, ponteiro tipo Imagem,
+Retorno: inteiro que indica se o desenho existe
+
+Descrição: permite que o usuário copie um determinado desenho.
+*****************************************************/
 int copiarCirculo(int dnum, Imagem *imagem){
 	/* verifica se o círculo existe */
 	if (dnum < 1 || dnum > imagem->desenho.numCirculos){
@@ -138,6 +168,13 @@ int copiarCirculo(int dnum, Imagem *imagem){
 	return 1;
 }
 
+/****************************************************
+Função: removerCirculo
+Parâmetros: numero do desenho, ponteiro tipo Imagem,
+Retorno: inteiro que indica se o desenho existe
+
+Descrição: permite que o usuário remova um determinado desenho.
+*****************************************************/
 int removerCirculo(int dnum, Imagem *imagem){
 	Desenho *d = &imagem->desenho;
 

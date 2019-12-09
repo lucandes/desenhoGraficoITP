@@ -19,6 +19,14 @@ Preencher criarPreenchimento(Ponto p, Cor novaCor, Imagem *imagem){
 	return fill;
 }
 
+/****************************************************
+Função: lerPreencher
+Parâmetros: inteiro temArquivo, arquivo de especificação, ponteiro tipo Imagem
+Retorno: nenhum
+
+Descrição: faz a leitura dos paramêtros necessários para a criação
+de um novo desenho na imagem, chama a função de criação
+*****************************************************/
 void lerPreencher(int temArquivo, FILE *arqEspecificacao, Imagem *imagem){
 	Ponto p;
 	lerPontos(&p, 1, temArquivo, arqEspecificacao);
@@ -71,6 +79,14 @@ void inserirPreenchimento(int x, int y, Preencher p, Imagem *imagem){
 	inserirPreenchimento(x, y-1, p, imagem);
 }
 
+/****************************************************
+Função: editarPreencher
+Parâmetros: numero do desenho, ponteiro tipo Imagem, inteiro temArquivo, arquivo de especificação
+Retorno: nenhum
+
+Descrição: permite que o usuário reescreva as informações de
+um determinado desenho.
+*****************************************************/
 void editarPreencher(int dnum, Imagem *imagem, int temArquivo, FILE *arqEspecificacao){
 	/* verifica se o preenchimento existe */
 	if (dnum < 1 || dnum > imagem->desenho.numPreencher){
@@ -88,6 +104,13 @@ void editarPreencher(int dnum, Imagem *imagem, int temArquivo, FILE *arqEspecifi
 	imagem->desenho.preencher[dnum - 1] = fill;
 }
 
+/****************************************************
+Função: moverPreencher
+Parâmetros: numero do desenho, vetor distancia do deslocamento, ponteiro tipo Imagem,
+Retorno: nenhum
+
+Descrição: permite que o usuário mova um determinado desenho.
+*****************************************************/
 int moverPreencher(int dnum, int dist[2], Imagem *imagem){
 	/* verifica se o preenchimento existe */
 	if (dnum < 1 || dnum > imagem->desenho.numPreencher){
@@ -101,6 +124,13 @@ int moverPreencher(int dnum, int dist[2], Imagem *imagem){
 	return 1;
 }
 
+/****************************************************
+Função: copiarPreencher
+Parâmetros: numero do desenho, ponteiro tipo Imagem,
+Retorno: inteiro que indica se o desenho existe
+
+Descrição: permite que o usuário copie um determinado desenho.
+*****************************************************/
 int copiarPreencher(int dnum, Imagem *imagem){
 	/* verifica se o preenchimento existe */
 	if (dnum < 1 || dnum > imagem->desenho.numPreencher){
@@ -117,6 +147,13 @@ int copiarPreencher(int dnum, Imagem *imagem){
 	return 1;
 }
 
+/****************************************************
+Função: removerPreencher
+Parâmetros: numero do desenho, ponteiro tipo Imagem,
+Retorno: inteiro que indica se o desenho existe
+
+Descrição: permite que o usuário remova um determinado desenho.
+*****************************************************/
 int removerPreencher(int dnum, Imagem *imagem){
 	Desenho *d = &imagem->desenho;
 

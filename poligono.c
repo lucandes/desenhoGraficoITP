@@ -20,6 +20,14 @@ Poligono criarPoligono(int numFaces, Ponto *pontos, Imagem *imagem){
 	return pol;
 }
 
+/****************************************************
+Função: lerRetangulo
+Parâmetros: inteiro temArquivo, arquivo de especificação, ponteiro tipo Imagem
+Retorno: nenhum
+
+Descrição: faz a leitura dos paramêtros necessários para a criação
+de um novo desenho na imagem, chama a função de criação
+*****************************************************/
 void lerRetangulo(int temArquivo, FILE *arqEspecificacao, Imagem *imagem){
 	/* leitura do ponto inicial e das dimensões */
 	Ponto pontoInicial;
@@ -43,6 +51,14 @@ void lerRetangulo(int temArquivo, FILE *arqEspecificacao, Imagem *imagem){
 	imagem->desenho.ordem[m] = 2; // 2 representa poligonos
 }
 
+/****************************************************
+Função: lerPoligono
+Parâmetros: inteiro temArquivo, arquivo de especificação, ponteiro tipo Imagem
+Retorno: nenhum
+
+Descrição: faz a leitura dos paramêtros necessários para a criação
+de um novo desenho na imagem, chama a função de criação
+*****************************************************/
 void lerPoligono(int temArquivo, FILE *arqEspecificacao, Imagem *imagem){
 	int numFaces; 
 	lerInteiros(&numFaces, 1, temArquivo, arqEspecificacao);
@@ -121,6 +137,14 @@ void gerarPontosRet(Ponto pontoInicial, Ponto pontos[4], int dim[2]){
 	pontos[3].y += distY;
 }
 
+/****************************************************
+Função: editarRetangulo
+Parâmetros: numero do desenho, ponteiro tipo Imagem, inteiro temArquivo, arquivo de especificação
+Retorno: nenhum
+
+Descrição: permite que o usuário reescreva as informações de
+um determinado desenho.
+*****************************************************/
 void editarRetangulo(int dnum, Imagem *imagem, int temArquivo, FILE *arqEspecificacao){
 	/* verifica se o poligono existe */
 	if (dnum < 1 || dnum > imagem->desenho.numPoligonos){
@@ -146,6 +170,14 @@ void editarRetangulo(int dnum, Imagem *imagem, int temArquivo, FILE *arqEspecifi
 	imagem->desenho.poligonos[dnum - 1] = pol;
 }
 
+/****************************************************
+Função: editarPoligono
+Parâmetros: numero do desenho, ponteiro tipo Imagem, inteiro temArquivo, arquivo de especificação
+Retorno: nenhum
+
+Descrição: permite que o usuário reescreva as informações de
+um determinado desenho.
+*****************************************************/
 void editarPoligono(int dnum, Imagem *imagem, int temArquivo, FILE *arqEspecificacao){
 	/* verifica se o poligono existe */
 	if (dnum < 1 || dnum > imagem->desenho.numPoligonos){
@@ -170,6 +202,13 @@ void editarPoligono(int dnum, Imagem *imagem, int temArquivo, FILE *arqEspecific
 	imagem->desenho.poligonos[dnum - 1] = pol;
 }
 
+/****************************************************
+Função: moverPoligono
+Parâmetros: numero do desenho, vetor distancia do deslocamento, ponteiro tipo Imagem,
+Retorno: nenhum
+
+Descrição: permite que o usuário mova um determinado desenho.
+*****************************************************/
 int moverPoligono(int dnum, int dist[2], Imagem *imagem){
 	/* verifica se o poligono existe */
 	if (dnum < 1 || dnum > imagem->desenho.numPoligonos){
@@ -191,6 +230,13 @@ int moverPoligono(int dnum, int dist[2], Imagem *imagem){
 	return 1;
 }
 
+/****************************************************
+Função: copiarPoligono
+Parâmetros: numero do desenho, ponteiro tipo Imagem,
+Retorno: inteiro que indica se o desenho existe
+
+Descrição: permite que o usuário copie um determinado desenho.
+*****************************************************/
 int copiarPoligono(int dnum, Imagem *imagem){
 	/* verifica se o poligono existe */
 	if (dnum < 1 || dnum > imagem->desenho.numPoligonos){
@@ -208,6 +254,13 @@ int copiarPoligono(int dnum, Imagem *imagem){
 	return 1;
 }
 
+/****************************************************
+Função: removerPoligono
+Parâmetros: numero do desenho, ponteiro tipo Imagem,
+Retorno: inteiro que indica se o desenho existe
+
+Descrição: permite que o usuário remova um determinado desenho.
+*****************************************************/
 int removerPoligono(int dnum, Imagem *imagem){
 	Desenho *d = &imagem->desenho;
 

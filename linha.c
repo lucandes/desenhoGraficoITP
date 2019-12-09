@@ -23,6 +23,15 @@ Linha criarLinha(Ponto pontos[2], Cor cor, Imagem *imagem){
 	return linha;
 }	
 
+
+/****************************************************
+Função: lerLinha
+Parâmetros: inteiro temArquivo, arquivo de especificação, ponteiro tipo Imagem
+Retorno: nenhum
+
+Descrição: faz a leitura dos paramêtros necessários para a criação
+de um novo desenho na imagem, chama a função de criação
+*****************************************************/
 void lerLinha(int temArquivo, FILE *arqEspecificacao, Imagem *imagem){
 	Ponto pontos[2];
 	lerPontos(pontos, 2, temArquivo, arqEspecificacao);
@@ -102,6 +111,14 @@ void inserirLinha(Linha linha, Imagem *imagem){
 	}
 }
 
+/****************************************************
+Função: editarLinha
+Parâmetros: numero do desenho, ponteiro tipo Imagem, inteiro temArquivo, arquivo de especificação
+Retorno: nenhum
+
+Descrição: permite que o usuário reescreva as informações de
+um determinado desenho.
+*****************************************************/
 void editarLinha(int dnum, Imagem *imagem, int temArquivo, FILE *arqEspecificacao){
 	/* verifica se a linha existe */
 	if (dnum < 1 || dnum > imagem->desenho.numLinhas){
@@ -125,6 +142,13 @@ void editarLinha(int dnum, Imagem *imagem, int temArquivo, FILE *arqEspecificaca
 	imagem->desenho.linhas[dnum - 1] = l;
 }
 
+/****************************************************
+Função: moverLinha
+Parâmetros: numero do desenho, vetor distancia do deslocamento, ponteiro tipo Imagem,
+Retorno: nenhum
+
+Descrição: permite que o usuário mova um determinado desenho.
+*****************************************************/
 int moverLinha(int dnum, int dist[2], Imagem *imagem){
 	/* verifica se a linha existe */
 	if (dnum < 1 || dnum > imagem->desenho.numLinhas){
@@ -141,6 +165,13 @@ int moverLinha(int dnum, int dist[2], Imagem *imagem){
 	return 1;
 }
 
+/****************************************************
+Função: copiarCirculo
+Parâmetros: numero do desenho, ponteiro tipo Imagem,
+Retorno: inteiro que indica se o desenho existe
+
+Descrição: permite que o usuário copie um determinado desenho.
+*****************************************************/
 int copiarLinha(int dnum, Imagem *imagem){
 	/* verifica se a linha existe */
 	if (dnum < 1 || dnum > imagem->desenho.numLinhas){
@@ -158,6 +189,13 @@ int copiarLinha(int dnum, Imagem *imagem){
 	return 1;
 }
 
+/****************************************************
+Função: copiarCirculo
+Parâmetros: numero do desenho, ponteiro tipo Imagem,
+Retorno: inteiro que indica se o desenho existe
+
+Descrição: permite que o usuário remova um determinado desenho.
+*****************************************************/
 int removerLinha(int dnum, Imagem *imagem){
 	Desenho *d = &imagem->desenho;
 

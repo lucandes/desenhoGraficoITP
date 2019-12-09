@@ -1,31 +1,24 @@
 imagem 300 300
-# ceu
 limpar 20 20 150
-# lua
 color 255 255 255
 circulo 50 50 30
 fill 50 50 255 255 255
-# estrelas
 color 255 255 255
 line 200 30 205 35
 line 200 35 205 30
 line 140 50 143 53
 line 140 53 143 50
-# montanhas
 color 0 150 0
 line 0 200 100 150
 line 100 150 200 200
 line 200 200 299 150
 fill 299 299 0 150 0
-# parede da casa
 color 180 180 50
 rect 20 220 90 60
 fill 21 221 180 180 50
-# teto da casa
 color 100 0 0
 polygon 3 0 219 130 219 65 180
 fill 60 215 100 0 0
-# porta da casa
 color 80 40 40
 rect 80 245 20 35
 fill 81 246 80 40 40

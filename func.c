@@ -37,7 +37,7 @@ void printAjuda(int temArquivo){
 }
 
 /****************************************************
-Função: liberaAD
+Função: liberarAD
 Parâmetros: ponteiro de estrutura Imagem, matriz do tipo Cor
 Retorno: nenhum
 
@@ -88,7 +88,7 @@ void limpaConsole(void){
 }
 
 /****************************************************
-Função: lerArquivo
+Função: novoArquivo
 Parâmetros: ponteiro de int temArquivo, tipo Imagem
 Retorno: ponteiro tipo FILE
 
@@ -110,7 +110,7 @@ FILE *novoArquivo(int *temArquivo, Imagem imagem){
 }
 
 /****************************************************
-Função: lerDoArquivo
+Função: lerArquivo
 Parâmetros: ponteiro de arquivo FILE, string entrada
 Retorno: int eof
 
@@ -141,6 +141,7 @@ int lerArquivo(FILE *arquivo, char *entrada){
 	
 	return 0;
 }
+
 /****************************************************
 Função: verificaCoordenadas
 Parâmetros: inteiro x, inteiro y, ponteiro de imagem
@@ -161,6 +162,14 @@ int verificaCoordenadas(int x, int y, Imagem *imagem){
 	return 1;
 }
 
+/****************************************************
+Função: compararCor
+Parâmetros: cor 1, cor 2
+Retorno: inteiro
+
+Descrição: verifica os valores de cor de ambas as cores e
+retorna 1 se forem iguais.
+*****************************************************/
 int compararCor(Cor cor1, Cor cor2){
 	if (cor1.r == cor2.r &&
 		cor1.g == cor2.g &&

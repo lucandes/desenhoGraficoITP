@@ -55,7 +55,7 @@ Imagem criarImagem(int *imagemAberta, int lar, int alt){
 }
 
 /****************************************************
-Função: lerImagem
+Função: abrirImagem
 Parâmetros: nenhum
 Retorno: tipo Imagem
 

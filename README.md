@@ -1,8 +1,7 @@
-(permite mover um desenho de posicao)# Desenho Gráfico em C
+# Desenho Gráfico em C
 Projeto referente a terceira unidade da disciplina Introdução à Técnicas de Programação
 
 ![alt_text](https://user-images.githubusercontent.com/51387908/70461336-38969d00-1a97-11ea-8372-8e52df629787.png)
-![alt_text](https://user-images.githubusercontent.com/51387908/70461333-38969d00-1a97-11ea-8d1b-e0344dd5a18f.png)
 ![alt_text](https://user-images.githubusercontent.com/51387908/70461335-38969d00-1a97-11ea-97a6-6382f455a4ae.png)
 ![alt_text](https://user-images.githubusercontent.com/51387908/70461332-37fe0680-1a97-11ea-8970-b6532a8fd9c4.png)
 
@@ -31,8 +30,8 @@ $ ./main<br></i></t>
 > 12. ler     -    (lê um arquivo de especificação)
 
 ## Funções extra
-> autosave - (habilita o salvamento automatico da imagem)
-> editar - (permite redefinir as configuracoes do desenho)
-> mover - (permite mover um desenho de posicao)
+> autosave - (habilita o salvamento automático da imagem)
+> editar - (permite redefinir as configurações do desenho)
+> mover - (permite mover um desenho de posição)
 > copiar - (copia um desenho da imagem)
 > remover - (remove um desenho da imagem)

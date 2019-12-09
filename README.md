@@ -30,8 +30,8 @@ $ ./main<br></i></t>
 > 12. ler     -    (lê um arquivo de especificação)
 
 ## Funções extra
-> autosave - (habilita o salvamento automático da imagem)
-> editar - (permite redefinir as configurações do desenho)
-> mover - (permite mover um desenho de posição)
-> copiar - (copia um desenho da imagem)
+> autosave - (habilita o salvamento automático da imagem)<br>
+> editar - (permite redefinir as configurações do desenho)<br>
+> mover - (permite mover um desenho de posição)<br>
+> copiar - (copia um desenho da imagem)<br>
 > remover - (remove um desenho da imagem)

@@ -55,8 +55,8 @@ void lerPreencher(int temArquivo, FILE *arqEspecificacao, Imagem *imagem)
  *    *    * Retorno: nenhum
  *     *     *
  *      *      * Descrição: altera os pixels de uma área de mesma cor. Funciona de maneira
- *       *       * recursiva, verificando os pixels em 4 sentidos opostos a partir do pixel
- *        *        * inicial. (ERRO DE SEGMENTAÇÃO EM ÁREAS EXTENSAS)
+ *       *       * iterativa, com uma pilha como suporte para buscas em área. Utiliza uma 
+ *        *        * função modificada do flood fill para ajudar no gasto de memória.
  *         *         * *****************************************************/
 void inserirPreenchimento(int x, int y, Preencher fill, Imagem *imagem)
 {
@@ -79,13 +79,13 @@ void inserirPreenchimento(int x, int y, Preencher fill, Imagem *imagem)
         w = e = x;
         while(w>0 && compararCor(corAtual,imagem->pixelsCopy[y][w]))
             w--;
-        while(e<imagem->lar-1 && compararCor(corAtual,imagem->pixelsCopy[y][e]))
+        while(e<imagem->lar && compararCor(corAtual,imagem->pixelsCopy[y][e]))
             e++;
-        for(i = w+1; i < e; i++)
+        for(i = w+1	; i < e; i++)
         {
 
             imagem->pixelsCopy[y][i] = fill.novaCor;
-            if(sz < TAM && y+1 < imagem->alt-1 && compararCor(corAtual,imagem->pixelsCopy[y+1][i]))
+            if(sz < TAM && y+1 < imagem->alt && compararCor(corAtual,imagem->pixelsCopy[y+1][i]))
             {
                 Ponto np = {i,y+1};
                 stack[sz++] = np;
@@ -93,11 +93,11 @@ void inserirPreenchimento(int x, int y, Preencher fill, Imagem *imagem)
 
             if(sz < TAM && y-1 >= 0 && compararCor(corAtual,imagem->pixelsCopy[y-1][i]))
             {
-                puts("IN");
-
+		
                 Ponto np = {i,y-1};
                 stack[sz++] = np;
             }
+	    
 
         }
     }
